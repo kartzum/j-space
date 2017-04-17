@@ -6,6 +6,7 @@ Simple java + gradle start application.
 
 ## java-concurrency
 Examples of concurrency in Java.
+
 ### Create Thread
 io.rdlab.java.concurrency.simple.Start
 ```
@@ -37,5 +38,8 @@ high-priority threads that want to obtain the lock and also hold the lock for lo
 threads get a chance to obtain the lock? In other words, in a situation where low-priority threads “starve” for a long
 time trying to obtain the lock is known as lock starvation.
 ```
+### The Wait/Notify Mechanism
+io.rdlab.java.concurrency.wait.notify.Start
+
 ### Links
 * [Java Concurrency / Multithreading Tutorial](http://tutorials.jenkov.com/java-concurrency/index.html)
