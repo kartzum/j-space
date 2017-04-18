@@ -42,7 +42,12 @@ time trying to obtain the lock is known as lock starvation.
 io.rdlab.java.concurrency.wait.notify.Start
 ### Fork/Join Framework
 io.rdlab.java.concurrency.fork.join.Start
+### akka
+io.rdlab.java.concurrency.akka.Start
 ### Links
 * [Java Concurrency / Multithreading Tutorial](http://tutorials.jenkov.com/java-concurrency/index.html)
 * [Fork/Join Framework](https://habrahabr.ru/post/128985/)
 * [JDK concurrent package](https://habrahabr.ru/post/187854/)
+* [Реактивные акторы на java](https://habrahabr.ru/post/232897/)
+* [Some example code of using Akka from Java](https://github.com/fhopf/akka-crawler-example)
+* [Modern Java - A Guide to Java 8 http://winterbe.com](https://github.com/winterbe/java8-tutorial)
