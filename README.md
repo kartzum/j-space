@@ -1,5 +1,9 @@
 # j-space
-Basic Java Examples
+Java Examples
+
+## Tasks & Questions
+
+* [java-interview](https://github.com/enhorse/java-interview)
 
 ## g-start
 Simple java + gradle start application.
@@ -13,12 +17,14 @@ io.rdlab.java.concurrency.simple.Start
 final Thread thread = new Thread(() -> System.out.println(Thread.currentThread().getName()));
 thread.start();
 ```
+
 ### Deadlocks
 io.rdlab.java.concurrency.deadlock.Start
 ```
 A deadlock arises when locking threads result in a situation where they cannot proceed and thus wait indefinitely
 for others to terminate.
 ```
+
 ### Livelocks
 ```
 To help understand livelocks, let’s consider an analogy. Assume that there are two robotic cars that are programmed
@@ -29,6 +35,7 @@ the following situation could happen: each car starts to enter the bridge, notic
 the same, and reverses! Note that the cars keep moving forward and backward and thus appear as if they’re doing lots
 of work, but there is no progress made by either of the cars. This situation is called a livelock.
 ```
+
 ### Lock Starvation
 ```
 Consider the situation in which numerous threads have different priorities assigned to them (in the range of lowest
@@ -38,12 +45,16 @@ high-priority threads that want to obtain the lock and also hold the lock for lo
 threads get a chance to obtain the lock? In other words, in a situation where low-priority threads “starve” for a long
 time trying to obtain the lock is known as lock starvation.
 ```
+
 ### The Wait/Notify Mechanism
 io.rdlab.java.concurrency.wait.notify.Start
+
 ### Fork/Join Framework
 io.rdlab.java.concurrency.fork.join.Start
+
 ### akka
 io.rdlab.java.concurrency.akka.Start
+
 ### Links
 * [Java Concurrency / Multithreading Tutorial](http://tutorials.jenkov.com/java-concurrency/index.html)
 * [Fork/Join Framework](https://habrahabr.ru/post/128985/)
