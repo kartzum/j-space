@@ -11,9 +11,6 @@ Simple java + gradle start application.
 ## java-concurrency
 Examples of concurrency in Java.
 
-## j19
-j19.
-
 ### Create Thread
 io.rdlab.java.concurrency.simple.Start
 ```
@@ -65,3 +62,10 @@ io.rdlab.java.concurrency.akka.Start
 * [Реактивные акторы на java](https://habrahabr.ru/post/232897/)
 * [Some example code of using Akka from Java](https://github.com/fhopf/akka-crawler-example)
 * [Modern Java - A Guide to Java 8 http://winterbe.com](https://github.com/winterbe/java8-tutorial)
+
+## j19
+j19.
+
+### loom
+
+* [structured-concurrency](https://stackoverflow.com/questions/73229247/how-can-i-run-jdk-19-with-structured-concurrency)
