@@ -70,6 +70,9 @@ j19.
 
 * [structured-concurrency](https://stackoverflow.com/questions/73229247/how-can-i-run-jdk-19-with-structured-concurrency)
 
+### streams
+* [The Java 8 Stream API Tutorial](https://www.baeldung.com/java-8-streams)
+
 ## sbj
 sbj.
 
