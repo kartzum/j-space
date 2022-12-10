@@ -95,6 +95,7 @@ docker-compose up
 * [Запускаем PostgreSQL в Docker: от простого к сложному](https://habr.com/ru/post/578744/)
 * [Docker Compose Postgres initdb](https://onexlab-io.medium.com/docker-compose-postgres-initdb-ba0021deef76)
 
+#### psql_hn
 
 ### hn
 
