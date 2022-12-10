@@ -94,3 +94,10 @@ docker-compose up
 
 * [Запускаем PostgreSQL в Docker: от простого к сложному](https://habr.com/ru/post/578744/)
 * [Docker Compose Postgres initdb](https://onexlab-io.medium.com/docker-compose-postgres-initdb-ba0021deef76)
+
+
+### hn
+
+* [Accessing Data with JPA](https://spring.io/guides/gs/accessing-data-jpa/)
+* [Spring Boot PostgreSQL](https://zetcode.com/springboot/postgresql/)
+* [Spring Boot 2 + JUnit 5 + Mockito](https://frontbackend.com/spring-boot/spring-boot-2-junit-5-mockito)
