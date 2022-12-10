@@ -5,27 +5,29 @@ Java Examples
 
 * [java-interview](https://github.com/enhorse/java-interview)
 
-## g-start
+## Projects
+
+### g-start
 Simple java + gradle start application.
 
-## java-concurrency
+### java-concurrency
 Examples of concurrency in Java.
 
-### Create Thread
+#### Create Thread
 io.rdlab.java.concurrency.simple.Start
 ```
 final Thread thread = new Thread(() -> System.out.println(Thread.currentThread().getName()));
 thread.start();
 ```
 
-### Deadlocks
+#### Deadlocks
 io.rdlab.java.concurrency.deadlock.Start
 ```
 A deadlock arises when locking threads result in a situation where they cannot proceed and thus wait indefinitely
 for others to terminate.
 ```
 
-### Livelocks
+#### Livelocks
 ```
 To help understand livelocks, let’s consider an analogy. Assume that there are two robotic cars that are programmed
 to automatically drive in the road. There is a situation where two robotic cars reach the two opposite ends of a narrow
@@ -36,7 +38,7 @@ the same, and reverses! Note that the cars keep moving forward and backward and 
 of work, but there is no progress made by either of the cars. This situation is called a livelock.
 ```
 
-### Lock Starvation
+#### Lock Starvation
 ```
 Consider the situation in which numerous threads have different priorities assigned to them (in the range of lowest
 priority, 1, to highest priority, 10, which is the range allowed for priority of threads in Java). When a mutex lock is
@@ -46,16 +48,16 @@ threads get a chance to obtain the lock? In other words, in a situation where lo
 time trying to obtain the lock is known as lock starvation.
 ```
 
-### The Wait/Notify Mechanism
+#### The Wait/Notify Mechanism
 io.rdlab.java.concurrency.wait.notify.Start
 
-### Fork/Join Framework
+#### Fork/Join Framework
 io.rdlab.java.concurrency.fork.join.Start
 
-### akka
+#### akka
 io.rdlab.java.concurrency.akka.Start
 
-### Links
+#### Links
 * [Java Concurrency / Multithreading Tutorial](http://tutorials.jenkov.com/java-concurrency/index.html)
 * [Fork/Join Framework](https://habrahabr.ru/post/128985/)
 * [JDK concurrent package](https://habrahabr.ru/post/187854/)
@@ -63,18 +65,18 @@ io.rdlab.java.concurrency.akka.Start
 * [Some example code of using Akka from Java](https://github.com/fhopf/akka-crawler-example)
 * [Modern Java - A Guide to Java 8 http://winterbe.com](https://github.com/winterbe/java8-tutorial)
 
-## j19
+### j19
 j19.
 
-### loom
+#### loom
 
 * [structured-concurrency](https://stackoverflow.com/questions/73229247/how-can-i-run-jdk-19-with-structured-concurrency)
 
-### streams
+#### streams
 * [The Java 8 Stream API Tutorial](https://www.baeldung.com/java-8-streams)
 
-## sbj
+### sbj
 sbj.
 
-## sbk
+### sbk
 sbk.
