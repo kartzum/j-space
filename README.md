@@ -107,3 +107,8 @@ docker-compose up
 j20.
 
 * [JAVA 20 FEATURES](https://www.happycoders.eu/java/java-20-features/)
+
+## design
+
+### microservices
+* [API Gateway](https://habr.com/ru/companies/rosbank/articles/779770/)
