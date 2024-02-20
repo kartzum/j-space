@@ -111,6 +111,9 @@ j20.
 ### jlc17
 Project template for Java 17.
 
+### j17t
+Project with tasks.
+
 ## design
 
 ### microservices
