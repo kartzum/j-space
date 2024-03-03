@@ -114,6 +114,9 @@ Project template for Java 17.
 ### j17t
 Project with tasks.
 
+### jlcsb17
+Project template for Java 17 + SP + postgresql.
+
 ## design
 
 ### microservices
