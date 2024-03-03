@@ -117,6 +117,9 @@ Project with tasks.
 ### jlcsb17
 Project template for Java 17 + SP + postgresql.
 
+* [Building REST services with Spring](https://spring.io/guides/tutorials/rest)
+* [Accessing JPA Data with REST](https://spring.io/guides/gs/accessing-data-rest)
+
 ## design
 
 ### microservices
