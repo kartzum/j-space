@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Random;
 
 import static io.rdlab.cons.coap.californium.con.TestUtils.createClient;
 import static io.rdlab.cons.coap.californium.con.TestUtils.createEndpoint;
@@ -19,9 +20,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class SimpleCoapServerTest {
     @Test
     void postTest() throws ConnectorException, IOException {
+        Random random = new Random();
         SimpleCoapServer simpleCoapServer = null;
         String host = "0.0.0.0";
-        int port = 7012;
+        int port = 7012 + random.nextInt(10);
         Configuration configuration = Configuration.createStandardWithoutFile();
         String clientHost = "localhost";
         Endpoint endpoint = null;
