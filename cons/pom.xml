@@ -10,5 +10,6 @@
 
     <modules>
         <module>coap-californium-con</module>
+        <module>ms</module>
     </modules>
 </project>

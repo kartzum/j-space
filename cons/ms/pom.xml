@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.rdlab.cons</groupId>
-    <artifactId>coap-californium-con</artifactId>
+    <artifactId>ms</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
@@ -17,13 +17,6 @@
     </properties>
 
     <dependencies>
-        <!-- eclipse.californium.-->
-        <dependency>
-            <groupId>org.eclipse.californium</groupId>
-            <artifactId>californium-core</artifactId>
-            <version>3.12.0</version>
-        </dependency>
-
         <!-- slf4j.-->
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -78,7 +71,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>io.rdlab.cons.coap.californium.con.Main</mainClass>
+                            <mainClass>io.rdlab.cons.ms.Main</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -93,7 +86,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>io.rdlab.cons.coap.californium.con.Main</mainClass>
+                            <mainClass>io.rdlab.cons.ms.Main</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
