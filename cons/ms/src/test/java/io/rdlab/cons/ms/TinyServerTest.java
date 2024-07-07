@@ -35,7 +35,8 @@ public class TinyServerTest {
     void simpleLoadTest() throws InterruptedException {
         long iterations = 31L;
         long tokensCapacity = 10L;
-        boolean logging = true;
+        boolean logging = false;
+        boolean loggingStatistics = true;
         int port = generatePort();
         TinyServer tinyServer = TinyServer.create(
                 "0.0.0.0",
@@ -77,7 +78,8 @@ public class TinyServerTest {
         loadTestService.run();
         ConcurrentLinkedQueue<TinyStatisticsTask.TinyStatistics> tinyStatisticsQueue = new ConcurrentLinkedQueue<>();
         Timer statisticsTimer = new Timer("Timer");
-        TinyStatisticsTask tinyStatisticsTask = new TinyStatisticsTask(requestsCounter, tinyStatisticsQueue);
+        TinyStatisticsTask tinyStatisticsTask =
+                new TinyStatisticsTask(requestsCounter, tinyStatisticsQueue, loggingStatistics);
         statisticsTimer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -86,7 +88,7 @@ public class TinyServerTest {
         }, 10L, 1000L);
         TinyStatisticsDumpService tinyStatisticsDumpService =
                 new TinyStatisticsDumpService(
-                        true,
+                        loggingStatistics,
                         requestsCounter,
                         tinyStatisticsQueue,
                         requestsErrorsCounter,
