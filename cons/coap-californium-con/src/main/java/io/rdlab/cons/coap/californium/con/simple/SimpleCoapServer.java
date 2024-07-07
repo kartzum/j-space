@@ -1,5 +1,6 @@
 package io.rdlab.cons.coap.californium.con.simple;
 
+import com.sun.management.UnixOperatingSystemMXBean;
 import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.CoapServer;
 import org.eclipse.californium.core.config.CoapConfig;
@@ -10,6 +11,7 @@ import org.eclipse.californium.elements.config.UdpConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
@@ -22,7 +24,7 @@ public class SimpleCoapServer extends CoapServer {
         TcpConfig.register();
     }
 
-    private static Logger LOG = LoggerFactory.getLogger(SimpleCoapServer.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SimpleCoapServer.class);
 
     public static SimpleCoapServer create(
             String host,
@@ -30,6 +32,14 @@ public class SimpleCoapServer extends CoapServer {
             Configuration configuration,
             List<CoapResource> coapResources
     ) {
+        UnixOperatingSystemMXBean osMBean =
+                (UnixOperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
+        LOG.info(
+                "System. open: {}, max: {}.",
+                osMBean.getOpenFileDescriptorCount(),
+                osMBean.getMaxFileDescriptorCount()
+        );
+
         InetAddress addr;
         try {
             addr = InetAddress.getByName(host);

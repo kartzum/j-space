@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
+import static io.rdlab.cons.coap.californium.con.util.Utils.getEnv;
 import static io.rdlab.cons.coap.californium.con.util.Utils.setRootLogLevel;
 
 public class ServerTerminal {
@@ -26,6 +27,15 @@ public class ServerTerminal {
         }
     }
 
+    public static void run() {
+        String host = getEnv("CONS_HOST", "0.0.0.0");
+        int port = Integer.parseInt(getEnv("CONS_PORT", "7012"));
+        run(new ServerParams(
+                host,
+                port
+        ));
+    }
+
     private static void run(String propertiesFile) {
         String host;
         int port;
@@ -33,7 +43,7 @@ public class ServerTerminal {
             Properties properties = new Properties();
             properties.load(fileReader);
             host = properties.getProperty("HOST", "0.0.0.0");
-            port = Integer.valueOf(properties.getProperty("PORT", "7012"));
+            port = Integer.parseInt(properties.getProperty("PORT", "7012"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

@@ -14,10 +14,14 @@ Run server.
 java -Xms2048m -XX:ActiveProcessorCount=1 -jar ./coap-californium-con/target/coap-californium-con-1.0-SNAPSHOT-jar-with-dependencies.jar -e scs \ 
 -p scs.local.properties
 ```
+Or.
+```
+java -XX:+UseG1GC -Xms2048m -XX:ActiveProcessorCount=1 -jar ./coap-californium-con-1.0-SNAPSHOT-jar-with-dependencies.jar
+```
 
 Run client.
 ```
-java -XX:+UseG1GC -Xmx6144m -cp ./cf-extplugtest-client-3.12.0-SNAPSHOT.jar "org.eclipse.californium.extplugtests.BenchmarkClient" coap://localhost:7012/benchmark?rlen=1 --clients=600 --requests=100000
+java -XX:+UseG1GC -Xms2048m -XX:ActiveProcessorCount=1 -cp ./cf-extplugtest-client-3.12.0-SNAPSHOT.jar "org.eclipse.californium.extplugtests.BenchmarkClient" coap://localhost:7012/benchmark?rlen=1 --clients=200 --requests=4000
 ```
 
 ```
@@ -176,6 +180,95 @@ coap receive statistic:
    coap offloaded                :        0 (       0 overall).
    coap ignored                  :      205 (       0 overall).
 coap sent 754282, received 753611
+```
+
+#### 2024.07.07
+
+##### 1
+
+```
+java -XX:+UseG1GC -Xms2048m -XX:ActiveProcessorCount=1 -cp ./cf-extplugtest-client-3.12.0-SNAPSHOT.jar "org.eclipse.californium.extplugtests.BenchmarkClient" coap://localhost:7012/benchmark?rlen=1 --clients=200 --requests=4000
+
+Create 200 benchmark clients, expect to send 800000 requests overall to coap://localhost:7012/benchmark?rlen=1
+21:31:10.475: File: /proc/net/snmp
+21:31:10.477: File: /proc/net/snmp6
+21:31:10.537: Request:
+==[ CoAP Request ]=============================================
+MID    : 56091
+Token  : BCDE868574C1AE07
+Type   : CON
+Method : 0.02 - POST
+Options: {"Uri-Host":"localhost", "Uri-Path":"benchmark", "Content-Format":"text/plain", "Uri-Query":"rlen=1", "Accept":"text/plain"}
+Payload: 0 Bytes
+===============================================================
+21:31:10.540: >>> UDP(localhost/127.0.0.1:7012)
+21:31:10.575: Received response:
+==[ CoAP Response ]============================================
+MID    : 56091
+Token  : BCDE868574C1AE07
+Type   : ACK
+Status : 2.04 - CHANGED
+Options: {"Content-Format":"text/plain"}
+RTT    : 41 ms
+Payload: 1 Bytes
+---------------------------------------------------------------
+h
+===============================================================
+Benchmark clients, first request successful.
+Benchmark clients created. 352 ms, 565 clients/s
+21:31:10.980: register shutdown hook.
+Benchmark started.
+[0001]: 66432 requests (6623 reqs/s, 0 retransmissions (0.00%), 0 transmission errors (0.00%), 200 clients)
+[0002]: 225063 requests (15863 reqs/s, 0 retransmissions (0.00%), 0 transmission errors (0.00%), 200 clients)
+[0003]: 385883 requests (16082 reqs/s, 0 retransmissions (0.00%), 0 transmission errors (0.00%), 200 clients)
+[0004]: 537879 requests (15200 reqs/s, 0 retransmissions (0.00%), 0 transmission errors (0.00%), 200 clients)
+[0005]: 689971 requests (15209 reqs/s, 0 retransmissions (0.00%), 0 transmission errors (0.00%), 200 clients)
+[0006]: 786631 requests (9666 reqs/s, 200 retransmissions (0.21%), 0 transmission errors (0.00%), 200 clients)
+200 benchmark clients finished.
+   7 clients with 3980 to 3983 requests.
+  97 clients with 3984 to 3999 requests.
+  81 clients with 4000 to 4014 requests.
+  12 clients with 4017 to 4029 requests.
+   3 clients with 4032 to 4041 requests.
+21:32:19.678: uptime: 67601 ms, 1 processors
+21:32:19.680: cpu-time: 978 ms (per-processor: 978 ms, load: 1%)
+21:32:19.694: gc: 195 ms, 11 calls
+21:32:19.694: average load: 2.09
+21:32:19.694: 800000 requests sent, 800000 expected
+21:32:19.695: 800000 requests in 67601 ms, 11834 reqs/s
+21:32:19.695: 400 retransmissions (0.05%)
+21:32:19.699: connects          : #: 200, avg.: 145.45 ms, 95%: 164 ms, 99%: 166 ms, 99.9%: 166 ms, max.: 166 ms
+21:32:19.702: success-responses : #: 799800, avg.: 14.63 ms, 95%: 24 ms, 99%: 114 ms, 99.9%: 219 ms, max.: 4990 ms
+21:32:19.703: errors-responses  : no values available!
+21:32:19.706: single-blocks     : #: 799800, avg.: 10.72 ms, 95%: 19 ms, 99%: 84 ms, 99.9%: 219 ms, max.: 4987 ms
+21:32:19.707: coap endpoint statistic:
+coap send statistic:
+   coap requests                 :   800000 (       0 overall).
+   coap responses                :        0 (       0 overall).
+   coap acks                     :        0 (       0 overall).
+   coap rejects                  :        0 (       0 overall).
+   coap request retransmissions  :      400 (       0 overall).
+   coap response retransmissions :        0 (       0 overall).
+   coap errors                   :        0 (       0 overall).
+coap receive statistic:
+   coap requests                 :        0 (       0 overall).
+   coap responses                :   800000 (       0 overall).
+   coap acks                     :        0 (       0 overall).
+   coap rejects                  :        0 (       0 overall).
+   coap duplicate requests       :        0 (       0 overall).
+   coap duplicate responses      :        0 (       0 overall).
+   coap offloaded                :        0 (       0 overall).
+   coap ignored                  :        0 (       0 overall).
+coap sent 800400, received 800000
+21:32:19.709: udp4 network statistic:
+   udp4 OutDatagrams :  1600400 (       0 overall).
+   udp4 InDatagrams  :  1600279 (       0 overall).
+   udp4 SndbufErrors :        0 (       0 overall).
+   udp4 RcvbufErrors :      121 (       0 overall).
+   udp4 InErrors     :      121 (       0 overall).
+   udp4 InCsumErrors :        0 (       0 overall).
+   udp4 NoPorts      :        0 (       0 overall).
+$
 ```
 
 ## ms
