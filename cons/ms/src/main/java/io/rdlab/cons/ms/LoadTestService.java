@@ -52,6 +52,14 @@ public class LoadTestService implements Runnable, Closeable {
             return;
         }
         running = false;
+        try {
+            processingExecutorService.shutdownNow();
+        } catch (Exception e) {
+        }
+        try {
+            processingExecutorService.close();
+        } catch (Exception e) {
+        }
     }
 
     private class Processor implements Runnable {

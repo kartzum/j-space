@@ -70,7 +70,9 @@ public class TinyServerTest {
                     @Override
                     public void doError(Throwable throwable) {
                         requestsErrorsCounter.incrementAndGet();
-                        LOG.error(throwable.getMessage(), throwable);
+                        if (throwable.getMessage() != null && !throwable.getMessage().contains("Closed by interrupt")) {
+                            LOG.error(throwable.getMessage(), throwable);
+                        }
                     }
 
                     @Override

@@ -77,7 +77,9 @@ public class TinyClient implements Closeable {
             socket.receive(responsePacket);
         } catch (IOException e) {
             if (logging) {
-                LOG.error(e.getMessage(), e);
+                if (e.getMessage() != null && !e.getMessage().contains("Closed by interrupt")) {
+                    LOG.error(e.getMessage(), e);
+                }
             }
             throw new RuntimeException(e);
         }

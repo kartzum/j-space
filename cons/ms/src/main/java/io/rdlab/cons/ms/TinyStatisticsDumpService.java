@@ -56,7 +56,7 @@ public class TinyStatisticsDumpService {
         }
         TinyStatisticsDump tinyStatisticsDump = generateDump();
         LOG.info(
-                "Requests calls: {}, errors: {}, avg (~rps): {}, avg time (ms) {}.",
+                "Requests: {}, errors: {}, avg (~rps): {}, avg time (ms) {}.",
                 tinyStatisticsDump.requests(),
                 tinyStatisticsDump.requestsErrors(),
                 round(tinyStatisticsDump.avgRequestsDif()),
