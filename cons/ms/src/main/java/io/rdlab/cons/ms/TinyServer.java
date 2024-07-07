@@ -107,7 +107,9 @@ public class TinyServer implements Runnable, Closeable {
                 try {
                     serverSocket.receive(receivePacket);
                 } catch (IOException e) {
-                    LOG.error(e.getMessage(), e);
+                    if (!"Socket closed".equals(e.getMessage())) {
+                        LOG.error(e.getMessage(), e);
+                    }
                 }
                 packetProcessingExecutorService.submit(new PacketProcessor(serverSocket, receivePacket, handler));
             }
@@ -146,7 +148,9 @@ public class TinyServer implements Runnable, Closeable {
                 );
                 serverSocket.send(sendPacket);
             } catch (IOException e) {
-                LOG.error(e.getMessage(), e);
+                if (!"Socket closed".equals(e.getMessage())) {
+                    LOG.error(e.getMessage(), e);
+                }
                 throw new RuntimeException(e);
             }
         }
