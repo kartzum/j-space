@@ -1,8 +1,10 @@
 package io.rdlab.cons.ms;
 
+import com.sun.management.UnixOperatingSystemMXBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.management.ManagementFactory;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicLong;
@@ -18,6 +20,7 @@ public class TinyStatisticsDumpService {
     private final AtomicLong requestsErrorsCounter;
     private final AtomicLong requestsTimeElapsedCounter;
     private final CountDownLatch requestsCountDownLatch;
+    private final UnixOperatingSystemMXBean osMBean;
 
     public TinyStatisticsDumpService(
             boolean logging,
@@ -33,6 +36,7 @@ public class TinyStatisticsDumpService {
         this.requestsErrorsCounter = requestsErrorsCounter;
         this.requestsTimeElapsedCounter = requestsTimeElapsedCounter;
         this.requestsCountDownLatch = requestsCountDownLatch;
+        this.osMBean = (UnixOperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
     }
 
     public TinyStatisticsDump generateDump() {
@@ -51,7 +55,9 @@ public class TinyStatisticsDumpService {
                 requestsErrorsCounter.get(),
                 avgRequestsDif,
                 avgRequestsTimeElapsed,
-                requestsCountDownLatch.getCount()
+                requestsCountDownLatch.getCount(),
+                osMBean.getOpenFileDescriptorCount(),
+                osMBean.getMaxFileDescriptorCount()
         );
     }
 
@@ -61,12 +67,13 @@ public class TinyStatisticsDumpService {
         }
         TinyStatisticsDump tinyStatisticsDump = generateDump();
         LOG.info(
-                "Requests: {}, errors: {}, avg (~rps): {}, avg time (ms) {}, downs: {}.",
+                "Rs: {}, ers: {}, avg (~rps): {}, avg time (ms): {}, ds: {}, of: {}.",
                 tinyStatisticsDump.requests(),
                 tinyStatisticsDump.requestsErrors(),
                 round(tinyStatisticsDump.avgRequestsDif()),
                 round(tinyStatisticsDump.avgRequestsTimeElapsed()),
-                tinyStatisticsDump.requestsCountDowns
+                tinyStatisticsDump.openFileDescriptorCount(),
+                tinyStatisticsDump.requestsCountDowns()
         );
     }
 
@@ -75,7 +82,9 @@ public class TinyStatisticsDumpService {
             long requestsErrors,
             double avgRequestsDif,
             double avgRequestsTimeElapsed,
-            long requestsCountDowns
+            long requestsCountDowns,
+            long openFileDescriptorCount,
+            long maxFileDescriptorCount
     ) {
     }
 }

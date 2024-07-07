@@ -24,7 +24,7 @@ public class TinyServerTest {
     @Test
     void receiveData() {
         int port = generatePort();
-        TinyServer tinyServer = TinyServer.create("0.0.0.0", port, 1, new MultiplierHandler());
+        TinyServer tinyServer = TinyServer.create("0.0.0.0", port, 1, 1, new MultiplierHandler());
         tinyServer.run();
         TinyClient tinyClient = TinyClient.create("localhost", port, true);
         TinyClient.Response response = tinyClient.exchange(new byte[]{2});
@@ -45,6 +45,7 @@ public class TinyServerTest {
         TinyServer tinyServer = TinyServer.create(
                 "0.0.0.0",
                 port,
+                1,
                 1,
                 new MultiplierHandler()
         );

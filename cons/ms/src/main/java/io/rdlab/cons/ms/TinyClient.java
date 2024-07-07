@@ -1,10 +1,12 @@
 package io.rdlab.cons.ms;
 
+import com.sun.management.UnixOperatingSystemMXBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -59,7 +61,14 @@ public class TinyClient implements Closeable {
                 throw new RuntimeException(e);
             }
             if (logging) {
+                UnixOperatingSystemMXBean osMBean =
+                        (UnixOperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
                 LOG.info("Prepared. host: {}, port: {}.", host, port);
+                LOG.info(
+                        "System. open: {}, max: {}.",
+                        osMBean.getOpenFileDescriptorCount(),
+                        osMBean.getMaxFileDescriptorCount()
+                );
             }
         }
         DatagramPacket requestPacket = new DatagramPacket(data, data.length, address, port);

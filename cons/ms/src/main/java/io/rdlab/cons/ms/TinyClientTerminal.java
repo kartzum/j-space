@@ -1,10 +1,12 @@
 package io.rdlab.cons.ms;
 
+import com.sun.management.UnixOperatingSystemMXBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.time.Duration;
 import java.util.Properties;
 import java.util.Timer;
@@ -13,6 +15,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicLong;
+
+import static io.rdlab.cons.ms.Utils.getEnv;
 
 public class TinyClientTerminal {
     private static final Logger LOG = LoggerFactory.getLogger(TinyClientTerminal.class);
@@ -29,6 +33,17 @@ public class TinyClientTerminal {
             } else {
                 index++;
             }
+        }
+    }
+
+    public static void run() {
+        String host = getEnv("CONS_HOST", "0.0.0.0");
+        int port = Integer.parseInt(getEnv("CONS_PORT", "8003"));
+        String command = getEnv("CONS_COMMAND", "l");
+        if ("l".equals(command)) {
+            long iterations = Long.parseLong(getEnv("CONS_ITERATIONS", "31"));
+            long tokensCapacity = Long.parseLong(getEnv("CONS_TOKENS_CAPACITY", "10"));
+            runSimpleLoadTest(host, port, iterations, tokensCapacity);
         }
     }
 
@@ -77,12 +92,19 @@ public class TinyClientTerminal {
             long iterations,
             long tokensCapacity
     ) {
+        UnixOperatingSystemMXBean osMBean =
+                (UnixOperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
         LOG.info(
                 "Start simple load test command. host: {}, port: {}, it: {}, c: {}.",
                 host,
                 port,
                 iterations,
                 tokensCapacity
+        );
+        LOG.info(
+                "System. open: {}, max: {}.",
+                osMBean.getOpenFileDescriptorCount(),
+                osMBean.getMaxFileDescriptorCount()
         );
         boolean logging = false;
         boolean loggingStatistics = true;
@@ -109,6 +131,7 @@ public class TinyClientTerminal {
                     public void doError(Throwable throwable) {
                         if (throwable.getMessage() != null && !throwable.getMessage().contains("Closed by interrupt")) {
                             requestsErrorsCounter.incrementAndGet();
+                            LOG.error(throwable.getMessage(), throwable);
                         }
                     }
 

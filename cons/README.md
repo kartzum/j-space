@@ -180,3 +180,74 @@ coap sent 754282, received 753611
 
 ## ms
 Udp-servers.
+
+### Limits.
+
+* https://habr.com/ru/articles/661169/
+
+```
+19:39:43.987 [virtual-7296] ERROR io.rdlab.cons.ms.TinyClientTerminal -- java.net.SocketException: Too many open files
+java.lang.RuntimeException: java.net.SocketException: Too many open files
+	at io.rdlab.cons.ms.TinyClient.exchange(TinyClient.java:61)
+	at io.rdlab.cons.ms.RandomTaskGenerator$1.run(RandomTaskGenerator.java:34)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:572)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.lang.VirtualThread.run(VirtualThread.java:309)
+Caused by: java.net.SocketException: Too many open files
+	at java.base/sun.nio.ch.Net.socket0(Native Method)
+	at java.base/sun.nio.ch.Net.socket(Net.java:534)
+	at java.base/sun.nio.ch.DatagramChannelImpl.<init>(DatagramChannelImpl.java:211)
+	at java.base/sun.nio.ch.DatagramChannelImpl.<init>(DatagramChannelImpl.java:183)
+	at java.base/sun.nio.ch.SelectorProviderImpl.openUninterruptibleDatagramChannel(SelectorProviderImpl.java:54)
+	at java.base/java.net.DatagramSocket.createDelegate(DatagramSocket.java:1413)
+	at java.base/java.net.DatagramSocket.<init>(DatagramSocket.java:328)
+	at java.base/java.net.DatagramSocket.<init>(DatagramSocket.java:287)
+	at io.rdlab.cons.ms.TinyClient.exchange(TinyClient.java:56)
+	... 4 common frames omitted
+```
+
+Debian.
+```
+ulimit -n 400000
+```
+
+* https://docs.riak.com/riak/kv/2.2.3/using/performance/open-files-limit/
+
+### History
+
+#### 2024.07.07
+
+##### 1
+
+Remote testing.
+
+Run server.
+```
+java -Xms2048m -XX:ActiveProcessorCount=1 -XX:-MaxFDLimit -jar ./ms-1.0-SNAPSHOT-jar-with-dependencies.jar
+```
+
+Run simple load test.
+```
+java -Xms2048m -XX:ActiveProcessorCount=1 -XX:-MaxFDLimit -jar ./ms-1.0-SNAPSHOT-jar-with-dependencies.jar -e tc -p ./tc.local.m.properties
+```
+
+Result.
+```
+java -Xms2048m -XX:ActiveProcessorCount=1 -XX:-MaxFDLimit -jar ./ms-1.0-SNAPSHOT-jar-with-dependencies.jar -e tc -p ./tc.local.m.properties
+19:53:52.733 [main] INFO io.rdlab.cons.ms.TinyClientTerminal -- Start simple load test command. host: localhost, port: 8003, it: 120000, c: 12000.
+19:53:52.737 [main] INFO io.rdlab.cons.ms.TinyClientTerminal -- System. open: 5, max: 400000.
+19:53:52.772 [Timer] INFO io.rdlab.cons.ms.TinyStatisticsTask -- Rs: 0, ers: 0, avg (~rps): NaN, avg time (ms): NaN, ds: 120000, of: 5, dif: 0.
+19:53:53.773 [Timer] INFO io.rdlab.cons.ms.TinyStatisticsTask -- Rs: 11801, ers: 0, avg (~rps): 11801.0, avg time (ms): 0.11, ds: 108199, of: 3731, dif: 11801.
+19:53:54.771 [Timer] INFO io.rdlab.cons.ms.TinyStatisticsTask -- Rs: 24160, ers: 0, avg (~rps): 12080.0, avg time (ms): 89.04, ds: 95840, of: 2749, dif: 12359.
+19:53:55.777 [Timer] INFO io.rdlab.cons.ms.TinyStatisticsTask -- Rs: 37354, ers: 0, avg (~rps): 12449.66, avg time (ms): 64.09, ds: 82646, of: 4615, dif: 13189.
+19:53:56.789 [Timer] INFO io.rdlab.cons.ms.TinyStatisticsTask -- Rs: 48899, ers: 0, avg (~rps): 12224.0, avg time (ms): 91.59, ds: 71101, of: 6586, dif: 11547.
+19:53:57.781 [Timer] INFO io.rdlab.cons.ms.TinyStatisticsTask -- Rs: 60739, ers: 0, avg (~rps): 12147.4, avg time (ms): 112.34, ds: 59261, of: 7279, dif: 11841.
+19:53:58.785 [Timer] INFO io.rdlab.cons.ms.TinyStatisticsTask -- Rs: 73106, ers: 0, avg (~rps): 12183.66, avg time (ms): 130.11, ds: 46894, of: 8545, dif: 12365.
+19:53:59.785 [Timer] INFO io.rdlab.cons.ms.TinyStatisticsTask -- Rs: 84804, ers: 0, avg (~rps): 12114.57, avg time (ms): 135.83, ds: 35196, of: 8937, dif: 11700.
+19:54:00.788 [Timer] INFO io.rdlab.cons.ms.TinyStatisticsTask -- Rs: 97071, ers: 0, avg (~rps): 12133.5, avg time (ms): 147.71, ds: 22929, of: 10167, dif: 12266.
+19:54:01.789 [Timer] INFO io.rdlab.cons.ms.TinyStatisticsTask -- Rs: 108757, ers: 0, avg (~rps): 12083.77, avg time (ms): 150.51, ds: 11243, of: 10716, dif: 11686.
+19:54:02.782 [Timer] INFO io.rdlab.cons.ms.TinyStatisticsTask -- Rs: 120000, ers: 0, avg (~rps): 12000.0, avg time (ms): 138.73, ds: 0, of: 10539, dif: 11246.
+19:54:03.383 [main] INFO io.rdlab.cons.ms.TinyStatisticsTask -- Rs: 120000, ers: 0, avg (~rps): 12000.0, avg time (ms): 138.73, ds: 0, of: 8, dif: 0.
+19:54:03.384 [main] INFO io.rdlab.cons.ms.TinyStatisticsDumpService -- Rs: 120000, ers: 0, avg (~rps): 12000.0, avg time (ms): 138.73, ds: 8, of: 0.
+```
+

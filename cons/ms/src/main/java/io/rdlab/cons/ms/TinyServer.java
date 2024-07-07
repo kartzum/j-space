@@ -1,10 +1,12 @@
 package io.rdlab.cons.ms;
 
+import com.sun.management.UnixOperatingSystemMXBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.net.InetSocketAddress;
@@ -20,6 +22,7 @@ public class TinyServer implements Runnable, Closeable {
 
     private final String host;
     private final int port;
+    private final int nThreads;
     private final int bufferSize;
 
     private final ExecutorService packetProcessingExecutorService;
@@ -34,13 +37,15 @@ public class TinyServer implements Runnable, Closeable {
     public TinyServer(
             String host,
             int port,
+            int nThreads,
             int bufferSize,
             Handler handler
     ) {
         this.host = host;
         this.port = port;
+        this.nThreads = nThreads;
         this.bufferSize = bufferSize;
-        this.packetProcessingExecutorService = Executors.newFixedThreadPool(1);
+        this.packetProcessingExecutorService = Executors.newFixedThreadPool(nThreads);
         this.handler = handler;
         this.receiverProcessingExecutorService = Executors.newSingleThreadExecutor();
     }
@@ -48,10 +53,11 @@ public class TinyServer implements Runnable, Closeable {
     public static TinyServer create(
             String host,
             int port,
+            int nThreads,
             int bufferSize,
             Handler handler
     ) {
-        return new TinyServer(host, port, bufferSize, handler);
+        return new TinyServer(host, port, nThreads, bufferSize, handler);
     }
 
     @Override
@@ -59,7 +65,14 @@ public class TinyServer implements Runnable, Closeable {
         if (running) {
             return;
         }
-        LOG.info("Starting. host: {}, port: {}.", host, port);
+        UnixOperatingSystemMXBean osMBean =
+                (UnixOperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
+        LOG.info("Starting. host: {}, port: {}, nThreads: {}.", host, port, nThreads);
+        LOG.info(
+                "System. open: {}, max: {}.",
+                osMBean.getOpenFileDescriptorCount(),
+                osMBean.getMaxFileDescriptorCount()
+        );
         InetAddress addr;
         try {
             addr = InetAddress.getByName(host);
@@ -84,14 +97,14 @@ public class TinyServer implements Runnable, Closeable {
             return;
         }
         running = false;
-        LOG.info("Stopping. host: {}, port: {}.", host, port);
+        LOG.info("Stopping. host: {}, port: {}, nThreads: {}.", host, port, nThreads);
         if (serverSocket != null) {
             try {
                 serverSocket.close();
             } catch (Exception e) {
             }
         }
-        LOG.info("Stop. host: {}, port: {}.", host, port);
+        LOG.info("Stop. host: {}, port: {}, nThreads: {}.", host, port, nThreads);
     }
 
     private class Receiver implements Runnable {
@@ -99,7 +112,7 @@ public class TinyServer implements Runnable, Closeable {
         public void run() {
             byte[] buffer = new byte[bufferSize];
             DatagramPacket receivePacket = new DatagramPacket(buffer, buffer.length);
-            LOG.info("Start. host: {}, port: {}.", host, port);
+            LOG.info("Start. host: {}, port: {}, nThreads: {}.", host, port, nThreads);
             while (running) {
                 if (!running) {
                     break;

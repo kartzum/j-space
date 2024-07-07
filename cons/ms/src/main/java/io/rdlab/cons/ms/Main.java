@@ -19,6 +19,8 @@ public class Main {
             String value = getEnv("CONS_N", "ts");
             if ("ts".equals(value)) {
                 TinyServerTerminal.run();
+            } else if ("tc".equals(value)) {
+                TinyClientTerminal.run();
             }
         }
     }
