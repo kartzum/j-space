@@ -1,5 +1,8 @@
 package io.rdlab.cons.ms;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.FileReader;
 import java.io.IOException;
 import java.time.Duration;
@@ -12,6 +15,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class TinyClientTerminal {
+    private static final Logger LOG = LoggerFactory.getLogger(TinyClientTerminal.class);
+
     public static void run(String[] args) {
         int index = 0;
         while (index < args.length) {
@@ -54,6 +59,7 @@ public class TinyClientTerminal {
         if ("m".equals(command)) {
             try (TinyClient tinyClient = TinyClient.create(host, port, true)) {
                 byte v = 2;
+                LOG.info("Start m command.");
                 TinyClient.Response response = tinyClient.exchange(new byte[]{v});
                 System.out.printf("Request: %s, response: %s.%n", v, response.data()[0]);
             }
@@ -71,9 +77,16 @@ public class TinyClientTerminal {
             long iterations,
             long tokensCapacity
     ) {
+        LOG.info(
+                "Start simple load test command. host: {}, port: {}, it: {}, c: {}.",
+                host,
+                port,
+                iterations,
+                tokensCapacity
+        );
         boolean logging = false;
         boolean loggingStatistics = true;
-        CountDownLatch countDownLatch = new CountDownLatch((int) iterations);
+        CountDownLatch requestsCountDownLatch = new CountDownLatch((int) iterations);
         AtomicLong requestsCounter = new AtomicLong();
         AtomicLong requestsErrorsCounter = new AtomicLong();
         AtomicLong requestsTimeElapsedCounter = new AtomicLong();
@@ -85,7 +98,7 @@ public class TinyClientTerminal {
                     @Override
                     public void doBefore() {
                         requestsCounter.incrementAndGet();
-                        countDownLatch.countDown();
+                        requestsCountDownLatch.countDown();
                     }
 
                     @Override
@@ -94,8 +107,9 @@ public class TinyClientTerminal {
 
                     @Override
                     public void doError(Throwable throwable) {
-                        requestsErrorsCounter.incrementAndGet();
-                        countDownLatch.countDown();
+                        if (throwable.getMessage() != null && !throwable.getMessage().contains("Closed by interrupt")) {
+                            requestsErrorsCounter.incrementAndGet();
+                        }
                     }
 
                     @Override
@@ -112,7 +126,8 @@ public class TinyClientTerminal {
                         requestsCounter,
                         tinyStatisticsQueue,
                         requestsErrorsCounter,
-                        requestsTimeElapsedCounter
+                        requestsTimeElapsedCounter,
+                        requestsCountDownLatch
                 );
         Timer statisticsTimer = new Timer("Timer");
         TinyStatisticsTask tinyStatisticsTask =
@@ -129,7 +144,7 @@ public class TinyClientTerminal {
             }
         }, 10L, 1000L);
         try {
-            countDownLatch.await();
+            requestsCountDownLatch.await();
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }

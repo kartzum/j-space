@@ -43,12 +43,13 @@ public class TinyStatisticsTask implements Runnable {
             TinyStatisticsDumpService.TinyStatisticsDump tinyStatisticsDump =
                     tinyStatisticsDumpService.generateDump();
             LOG.info(
-                    "Requests calls: {}, errors: {}, avg (~rps): {}, avg time (ms): {}, dif: {}.",
+                    "Requests calls: {}, errors: {}, avg (~rps): {}, avg time (ms): {}, dif: {}, downs: {}.",
                     tinyStatisticsDump.requests(),
                     tinyStatisticsDump.requestsErrors(),
                     round(tinyStatisticsDump.avgRequestsDif()),
                     round(tinyStatisticsDump.avgRequestsTimeElapsed()),
-                    requestsDif
+                    requestsDif,
+                    tinyStatisticsDump.requestsCountDowns()
             );
         }
     }

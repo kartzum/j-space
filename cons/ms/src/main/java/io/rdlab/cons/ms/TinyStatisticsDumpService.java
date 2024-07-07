@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static io.rdlab.cons.ms.Utils.round;
@@ -16,19 +17,22 @@ public class TinyStatisticsDumpService {
     private final ConcurrentLinkedQueue<TinyStatisticsTask.TinyStatistics> tinyStatisticsQueue;
     private final AtomicLong requestsErrorsCounter;
     private final AtomicLong requestsTimeElapsedCounter;
+    private final CountDownLatch requestsCountDownLatch;
 
     public TinyStatisticsDumpService(
             boolean logging,
             AtomicLong requestsCounter,
             ConcurrentLinkedQueue<TinyStatisticsTask.TinyStatistics> tinyStatisticsQueue,
             AtomicLong requestsErrorsCounter,
-            AtomicLong requestsTimeElapsedCounter
+            AtomicLong requestsTimeElapsedCounter,
+            CountDownLatch requestsCountDownLatch
     ) {
         this.logging = logging;
         this.requestsCounter = requestsCounter;
         this.tinyStatisticsQueue = tinyStatisticsQueue;
         this.requestsErrorsCounter = requestsErrorsCounter;
         this.requestsTimeElapsedCounter = requestsTimeElapsedCounter;
+        this.requestsCountDownLatch = requestsCountDownLatch;
     }
 
     public TinyStatisticsDump generateDump() {
@@ -46,7 +50,8 @@ public class TinyStatisticsDumpService {
                 requestsCounter.get(),
                 requestsErrorsCounter.get(),
                 avgRequestsDif,
-                avgRequestsTimeElapsed
+                avgRequestsTimeElapsed,
+                requestsCountDownLatch.getCount()
         );
     }
 
@@ -56,11 +61,12 @@ public class TinyStatisticsDumpService {
         }
         TinyStatisticsDump tinyStatisticsDump = generateDump();
         LOG.info(
-                "Requests: {}, errors: {}, avg (~rps): {}, avg time (ms) {}.",
+                "Requests: {}, errors: {}, avg (~rps): {}, avg time (ms) {}, downs: {}.",
                 tinyStatisticsDump.requests(),
                 tinyStatisticsDump.requestsErrors(),
                 round(tinyStatisticsDump.avgRequestsDif()),
-                round(tinyStatisticsDump.avgRequestsTimeElapsed())
+                round(tinyStatisticsDump.avgRequestsTimeElapsed()),
+                tinyStatisticsDump.requestsCountDowns
         );
     }
 
@@ -68,7 +74,8 @@ public class TinyStatisticsDumpService {
             long requests,
             long requestsErrors,
             double avgRequestsDif,
-            double avgRequestsTimeElapsed
+            double avgRequestsTimeElapsed,
+            long requestsCountDowns
     ) {
     }
 }

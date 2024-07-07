@@ -48,7 +48,7 @@ public class TinyServerTest {
                 1,
                 new MultiplierHandler()
         );
-        CountDownLatch countDownLatch = new CountDownLatch((int) iterations);
+        CountDownLatch requestsCountDownLatch = new CountDownLatch((int) iterations);
         AtomicLong requestsCounter = new AtomicLong();
         AtomicLong requestsErrorsCounter = new AtomicLong();
         AtomicLong requestsTimeElapsedCounter = new AtomicLong();
@@ -60,7 +60,7 @@ public class TinyServerTest {
                     @Override
                     public void doBefore() {
                         requestsCounter.incrementAndGet();
-                        countDownLatch.countDown();
+                        requestsCountDownLatch.countDown();
                     }
 
                     @Override
@@ -69,8 +69,8 @@ public class TinyServerTest {
 
                     @Override
                     public void doError(Throwable throwable) {
-                        requestsErrorsCounter.incrementAndGet();
                         if (throwable.getMessage() != null && !throwable.getMessage().contains("Closed by interrupt")) {
+                            requestsErrorsCounter.incrementAndGet();
                             LOG.error(throwable.getMessage(), throwable);
                         }
                     }
@@ -90,7 +90,8 @@ public class TinyServerTest {
                         requestsCounter,
                         tinyStatisticsQueue,
                         requestsErrorsCounter,
-                        requestsTimeElapsedCounter
+                        requestsTimeElapsedCounter,
+                        requestsCountDownLatch
                 );
         Timer statisticsTimer = new Timer("Timer");
         TinyStatisticsTask tinyStatisticsTask =
@@ -106,7 +107,7 @@ public class TinyServerTest {
                 tinyStatisticsTask.run();
             }
         }, 10L, 1000L);
-        countDownLatch.await();
+        requestsCountDownLatch.await();
         sleep(10);
         assertEquals(iterations, requestsCounter.get());
         tinyServer.close();
