@@ -1,6 +1,8 @@
 package io.rdlab.cons.ms;
 
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.Random;
@@ -15,6 +17,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TinyServerTest {
+    private static final Logger LOG = LoggerFactory.getLogger(TinyServerTest.class);
+
     private final Random random = new Random();
 
     @Test
@@ -66,6 +70,7 @@ public class TinyServerTest {
                     @Override
                     public void doError(Throwable throwable) {
                         requestsErrorsCounter.incrementAndGet();
+                        LOG.error(throwable.getMessage(), throwable);
                     }
 
                     @Override
