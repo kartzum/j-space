@@ -8,4 +8,8 @@ public class Utils {
         }
         return defaultValue;
     }
+
+    public static double round(double value) {
+        return Math.floor(value * 100) / 100;
+    }
 }

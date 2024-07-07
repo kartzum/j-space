@@ -3,6 +3,7 @@ package io.rdlab.cons.ms;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -14,7 +15,7 @@ import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class TinyServer {
+public class TinyServer implements Runnable, Closeable {
     private static final Logger LOG = LoggerFactory.getLogger(TinyServer.class);
 
     private final String host;
@@ -53,7 +54,11 @@ public class TinyServer {
         return new TinyServer(host, port, bufferSize, handler);
     }
 
+    @Override
     public void run() {
+        if (running) {
+            return;
+        }
         LOG.info("Starting. host: {}, port: {}.", host, port);
         InetAddress addr;
         try {
@@ -72,7 +77,8 @@ public class TinyServer {
         receiverProcessingExecutorService.submit(new Receiver());
     }
 
-    public void stop() {
+    @Override
+    public void close() {
         if (!running) {
             return;
         }

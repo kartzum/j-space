@@ -31,6 +31,13 @@
             <version>${logback.version}</version>
         </dependency>
 
+        <!-- others.-->
+        <dependency>
+            <groupId>com.bucket4j</groupId>
+            <artifactId>bucket4j-core</artifactId>
+            <version>8.10.1</version>
+        </dependency>
+
         <!-- testing.-->
         <dependency>
             <groupId>org.junit.jupiter</groupId>

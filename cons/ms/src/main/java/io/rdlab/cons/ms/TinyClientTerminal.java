@@ -41,11 +41,14 @@ public class TinyClientTerminal {
             int port,
             String command
     ) {
-        TinyClient tinyClient = TinyClient.create(host, port);
         if ("m".equals(command)) {
-            byte v = 2;
-            TinyClient.Response response = tinyClient.exchange(new byte[]{v});
-            System.out.printf("Request: %s, response: %s.%n", v, response.data()[0]);
+            try (TinyClient tinyClient = TinyClient.create(host, port, true)) {
+                byte v = 2;
+                TinyClient.Response response = tinyClient.exchange(new byte[]{v});
+                System.out.printf("Request: %s, response: %s.%n", v, response.data()[0]);
+            }
+        } else if ("l".equals(command)) {
+
         }
     }
 }

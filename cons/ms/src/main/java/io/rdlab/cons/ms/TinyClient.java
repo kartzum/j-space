@@ -3,6 +3,7 @@ package io.rdlab.cons.ms;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -10,24 +11,31 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
-public class TinyClient {
+public class TinyClient implements Closeable {
     private static final Logger LOG = LoggerFactory.getLogger(TinyClient.class);
 
     private DatagramSocket socket;
     private InetAddress address;
     private final String host;
     private final int port;
+    private final boolean logging;
 
     public TinyClient(
             String host,
-            int port
+            int port,
+            boolean logging
     ) {
         this.host = host;
         this.port = port;
+        this.logging = logging;
     }
 
-    public static TinyClient create(String host, int port) {
-        return new TinyClient(host, port);
+    public static TinyClient create(
+            String host,
+            int port,
+            boolean logging
+    ) {
+        return new TinyClient(host, port, logging);
     }
 
     public Response exchange(byte[] data) {
@@ -47,7 +55,9 @@ public class TinyClient {
             } catch (SocketException e) {
                 throw new RuntimeException(e);
             }
-            LOG.info("Prepared. port: {}.", port);
+            if (logging) {
+                LOG.info("Prepared. host: {}, port: {}.", host, port);
+            }
         }
         DatagramPacket requestPacket = new DatagramPacket(data, data.length, address, port);
         try {
@@ -65,9 +75,12 @@ public class TinyClient {
         return new Response(responsePacket.getData(), responsePacket.getLength());
     }
 
-    public void stop() {
+    @Override
+    public void close() {
         if (socket != null) {
-            LOG.info("Stop. port: {}.", port);
+            if (logging) {
+                LOG.info("Stop. host: {}, port: {}.", host, port);
+            }
             socket.close();
             socket = null;
             address = null;
