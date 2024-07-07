@@ -53,6 +53,9 @@ public class TinyClient implements Closeable {
             try {
                 socket = new DatagramSocket();
             } catch (SocketException e) {
+                if (logging) {
+                    LOG.error(e.getMessage(), e);
+                }
                 throw new RuntimeException(e);
             }
             if (logging) {
@@ -63,6 +66,9 @@ public class TinyClient implements Closeable {
         try {
             socket.send(requestPacket);
         } catch (IOException e) {
+            if (logging) {
+                LOG.error(e.getMessage(), e);
+            }
             throw new RuntimeException(e);
         }
         byte[] responseBuffer = new byte[data.length];
@@ -70,6 +76,9 @@ public class TinyClient implements Closeable {
         try {
             socket.receive(responsePacket);
         } catch (IOException e) {
+            if (logging) {
+                LOG.error(e.getMessage(), e);
+            }
             throw new RuntimeException(e);
         }
         return new Response(responsePacket.getData(), responsePacket.getLength());
@@ -81,7 +90,10 @@ public class TinyClient implements Closeable {
             if (logging) {
                 LOG.info("Stop. host: {}, port: {}.", host, port);
             }
-            socket.close();
+            try {
+                socket.close();
+            } catch (Exception e) {
+            }
             socket = null;
             address = null;
         }

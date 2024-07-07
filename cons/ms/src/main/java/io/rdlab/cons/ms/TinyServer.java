@@ -71,6 +71,7 @@ public class TinyServer implements Runnable, Closeable {
         try {
             serverSocket = new DatagramSocket(inetSocketAddress);
         } catch (SocketException e) {
+            LOG.error(e.getMessage(), e);
             throw new RuntimeException(e);
         }
         running = true;
@@ -85,7 +86,10 @@ public class TinyServer implements Runnable, Closeable {
         running = false;
         LOG.info("Stopping. host: {}, port: {}.", host, port);
         if (serverSocket != null) {
-            serverSocket.close();
+            try {
+                serverSocket.close();
+            } catch (Exception e) {
+            }
         }
         LOG.info("Stop. host: {}, port: {}.", host, port);
     }
@@ -103,6 +107,7 @@ public class TinyServer implements Runnable, Closeable {
                 try {
                     serverSocket.receive(receivePacket);
                 } catch (IOException e) {
+                    LOG.error(e.getMessage(), e);
                 }
                 packetProcessingExecutorService.submit(new PacketProcessor(serverSocket, receivePacket, handler));
             }
@@ -141,6 +146,7 @@ public class TinyServer implements Runnable, Closeable {
                 );
                 serverSocket.send(sendPacket);
             } catch (IOException e) {
+                LOG.error(e.getMessage(), e);
                 throw new RuntimeException(e);
             }
         }

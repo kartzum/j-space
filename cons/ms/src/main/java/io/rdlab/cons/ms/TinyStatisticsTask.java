@@ -7,6 +7,8 @@ import java.time.Instant;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicLong;
 
+import static io.rdlab.cons.ms.Utils.round;
+
 public class TinyStatisticsTask implements Runnable {
     private static final Logger LOG = LoggerFactory.getLogger(TinyStatisticsTask.class);
 
@@ -15,14 +17,18 @@ public class TinyStatisticsTask implements Runnable {
     private final ConcurrentLinkedQueue<TinyStatistics> queue;
     private final boolean logging;
 
+    private final TinyStatisticsDumpService tinyStatisticsDumpService;
+
     public TinyStatisticsTask(
             AtomicLong requestsCounter,
             ConcurrentLinkedQueue<TinyStatistics> queue,
-            boolean logging
+            boolean logging,
+            TinyStatisticsDumpService tinyStatisticsDumpService
     ) {
         this.requestsCounter = requestsCounter;
         this.queue = queue;
         this.logging = logging;
+        this.tinyStatisticsDumpService = tinyStatisticsDumpService;
     }
 
     @Override
@@ -34,7 +40,16 @@ public class TinyStatisticsTask implements Runnable {
         long requestsDif = current - prev;
         queue.add(new TinyStatistics(instant, requestsDif));
         if (logging) {
-            LOG.info("Requests: requests: {}, dif: {}.", current, requestsDif);
+            TinyStatisticsDumpService.TinyStatisticsDump tinyStatisticsDump =
+                    tinyStatisticsDumpService.generateDump();
+            LOG.info(
+                    "Requests calls: {}, errors: {}, avg (~rps): {}, avg time (ms): {}, dif: {}.",
+                    tinyStatisticsDump.requests(),
+                    tinyStatisticsDump.requestsErrors(),
+                    round(tinyStatisticsDump.avgRequestsDif()),
+                    round(tinyStatisticsDump.avgRequestsTimeElapsed()),
+                    requestsDif
+            );
         }
     }
 

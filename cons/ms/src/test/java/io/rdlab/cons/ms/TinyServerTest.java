@@ -77,15 +77,6 @@ public class TinyServerTest {
         tinyServer.run();
         loadTestService.run();
         ConcurrentLinkedQueue<TinyStatisticsTask.TinyStatistics> tinyStatisticsQueue = new ConcurrentLinkedQueue<>();
-        Timer statisticsTimer = new Timer("Timer");
-        TinyStatisticsTask tinyStatisticsTask =
-                new TinyStatisticsTask(requestsCounter, tinyStatisticsQueue, loggingStatistics);
-        statisticsTimer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                tinyStatisticsTask.run();
-            }
-        }, 10L, 1000L);
         TinyStatisticsDumpService tinyStatisticsDumpService =
                 new TinyStatisticsDumpService(
                         loggingStatistics,
@@ -94,6 +85,20 @@ public class TinyServerTest {
                         requestsErrorsCounter,
                         requestsTimeElapsedCounter
                 );
+        Timer statisticsTimer = new Timer("Timer");
+        TinyStatisticsTask tinyStatisticsTask =
+                new TinyStatisticsTask(
+                        requestsCounter,
+                        tinyStatisticsQueue,
+                        loggingStatistics,
+                        tinyStatisticsDumpService
+                );
+        statisticsTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                tinyStatisticsTask.run();
+            }
+        }, 10L, 1000L);
         countDownLatch.await();
         sleep(10);
         assertEquals(iterations, requestsCounter.get());

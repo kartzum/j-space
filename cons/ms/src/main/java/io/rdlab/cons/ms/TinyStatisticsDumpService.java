@@ -31,10 +31,7 @@ public class TinyStatisticsDumpService {
         this.requestsTimeElapsedCounter = requestsTimeElapsedCounter;
     }
 
-    public void printStatistics() {
-        if (!logging) {
-            return;
-        }
+    public TinyStatisticsDump generateDump() {
         AtomicLong totalRequestsDiffs = new AtomicLong();
         AtomicLong totalRequests = new AtomicLong();
         tinyStatisticsQueue.forEach(statistics -> {
@@ -45,12 +42,33 @@ public class TinyStatisticsDumpService {
         });
         double avgRequestsDif = (double) totalRequestsDiffs.get() / totalRequests.get();
         double avgRequestsTimeElapsed = (double) requestsTimeElapsedCounter.get() / requestsCounter.get();
-        LOG.info(
-                "Requests calls: {}, errors: {}, avg (~rps): {}, avg time (ms) {}.",
+        return new TinyStatisticsDump(
                 requestsCounter.get(),
                 requestsErrorsCounter.get(),
-                round(avgRequestsDif),
-                round(avgRequestsTimeElapsed)
+                avgRequestsDif,
+                avgRequestsTimeElapsed
         );
+    }
+
+    public void printStatistics() {
+        if (!logging) {
+            return;
+        }
+        TinyStatisticsDump tinyStatisticsDump = generateDump();
+        LOG.info(
+                "Requests calls: {}, errors: {}, avg (~rps): {}, avg time (ms) {}.",
+                tinyStatisticsDump.requests(),
+                tinyStatisticsDump.requestsErrors(),
+                round(tinyStatisticsDump.avgRequestsDif()),
+                round(tinyStatisticsDump.avgRequestsTimeElapsed())
+        );
+    }
+
+    public record TinyStatisticsDump(
+            long requests,
+            long requestsErrors,
+            double avgRequestsDif,
+            double avgRequestsTimeElapsed
+    ) {
     }
 }
