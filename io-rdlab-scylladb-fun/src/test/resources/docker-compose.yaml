@@ -1,0 +1,8 @@
+services:
+  scylla:
+    image: scylladb/scylla:5.1.4
+    ports:
+      - "9042:9042"
+    volumes:
+      - "./scylla.yaml:/etc/scylla/scylla.yaml"
+    command: "--listen-address 0.0.0.0 --smp 1 --broadcast-rpc-address 0.0.0.0"
