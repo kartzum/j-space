@@ -123,6 +123,9 @@ Project template for Java 17 + SP + postgresql.
 ### cons
 Servers.
 
+### io-rdlab-scylladb-fun
+ScyllaDB examples.
+
 ## design
 
 ### microservices
