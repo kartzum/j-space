@@ -138,3 +138,4 @@ Servers.
 * [В чем разница между RPC и REST?](https://aws.amazon.com/ru/compare/the-difference-between-rpc-and-rest/)
 * [gRPC в качестве протокола межсервисного взаимодействия. Доклад Яндекса](https://habr.com/ru/companies/yandex/articles/484068/)
 * [Eventual Consistency vs. Strong Eventual Consistency vs. Strong Consistency](https://www.baeldung.com/cs/eventual-consistency-vs-strong-eventual-consistency-vs-strong-consistency)
+
