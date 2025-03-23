@@ -20,4 +20,11 @@ public interface PropertyService {
             long offset,
             long limit
     );
+
+    CompletionStage<Optional<String>> maxFrequencyText(
+            String group,
+            String name,
+            Instant start,
+            Instant end
+    );
 }

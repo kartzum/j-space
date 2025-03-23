@@ -21,6 +21,7 @@ import java.time.Instant;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -36,10 +37,13 @@ public class PropertyControllerTests extends ContainersRunner {
             new ParameterizedTypeReference<>() {
             };
 
-    private static final Instant DATE_1 = Instant.parse("2019-01-01T00:00:00Z");
+    private static final Instant DATE_1 = Instant.parse("2025-01-01T00:00:00Z");
 
     private static final Property PROPERTY_1 = new Property("g", "a", DATE_1, "data_1");
     private static final Property PROPERTY_2 = new Property("g", "a", DATE_1.plusSeconds(1), "data_2");
+    private static final Property PROPERTY_3 = new Property("g", "a", DATE_1.plusSeconds(2), "data_2");
+    private static final Property PROPERTY_4 = new Property("g", "a", DATE_1.plusSeconds(3), "data_3");
+    private static final Property PROPERTY_5 = new Property("g", "a", DATE_1.plusSeconds(5), "data_5");
 
     @Autowired
     private TestRestTemplate template;
@@ -69,7 +73,7 @@ public class PropertyControllerTests extends ContainersRunner {
     void shouldReturnProperty() {
         template.postForEntity(baseUri, PROPERTY_1, Property.class);
 
-        URI uri = UriComponentsBuilder.fromUri(baseUri).path("/g/a/20190101000000000").build().toUri();
+        URI uri = UriComponentsBuilder.fromUri(baseUri).path("/g/a/20250101000000000").build().toUri();
         Property property = template.getForObject(uri, Property.class);
 
         assertThat(property).isEqualTo(PROPERTY_1);
@@ -84,8 +88,8 @@ public class PropertyControllerTests extends ContainersRunner {
                 .path("/find")
                 .queryParam("group", "g")
                 .queryParam("name", "a")
-                .queryParam("start", "2000")
-                .queryParam("end", "2100")
+                .queryParam("start", "2024")
+                .queryParam("end", "2026")
                 .queryParam("offset", "0")
                 .queryParam("limit", "10")
                 .build()
@@ -97,5 +101,25 @@ public class PropertyControllerTests extends ContainersRunner {
         List<Property> properties = response.getBody();
         assertNotNull(properties);
         assertFalse(properties.isEmpty());
+    }
+
+    @Test
+    void shouldCalculateMaxFrequencyText() {
+        template.postForEntity(baseUri, PROPERTY_1, Property.class);
+        template.postForEntity(baseUri, PROPERTY_2, Property.class);
+        template.postForEntity(baseUri, PROPERTY_3, Property.class);
+        template.postForEntity(baseUri, PROPERTY_4, Property.class);
+        template.postForEntity(baseUri, PROPERTY_5, Property.class);
+
+        URI uri = UriComponentsBuilder.fromUri(baseUri)
+                .path("/max-frequency-text")
+                .queryParam("group", "g")
+                .queryParam("name", "a")
+                .queryParam("start", "2024")
+                .queryParam("end", "2026")
+                .build().toUri();
+
+        String maxFrequencyText = template.getForObject(uri, String.class);
+        assertEquals("data_2", maxFrequencyText);
     }
 }

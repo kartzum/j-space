@@ -33,4 +33,11 @@ public class PropertyServiceImpl implements PropertyService {
     ) {
         return propertyRepository.findByData(group, name, start, end, offset, limit);
     }
+
+    @Override
+    public CompletionStage<Optional<String>> maxFrequencyText(
+            String group, String name, Instant start, Instant end
+    ) {
+        return propertyRepository.maxFrequencyText(group, name, start, end);
+    }
 }

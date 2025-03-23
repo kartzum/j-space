@@ -42,8 +42,7 @@ public class PropertyController {
         return propertyService
                 .findById(group, name, date)
                 .thenApply(
-                        p -> p.map(ResponseEntity::ok)
-                                .orElse(ResponseEntity.notFound().build())
+                        p -> p.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build())
                 );
     }
 
@@ -57,5 +56,18 @@ public class PropertyController {
             @RequestParam(name = "limit") int limit
     ) {
         return propertyService.findByData(group, name, start, end, offset, limit);
+    }
+
+    @GetMapping("/max-frequency-text")
+    public CompletionStage<ResponseEntity<String>> maxFrequencyText(
+            @RequestParam(name = "group") String group,
+            @RequestParam(name = "name") String name,
+            @RequestParam(name = "start") Instant start,
+            @RequestParam(name = "end") Instant end
+    ) {
+        return propertyService.maxFrequencyText(group, name, start, end)
+                .thenApply(
+                        p -> p.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build())
+                );
     }
 }

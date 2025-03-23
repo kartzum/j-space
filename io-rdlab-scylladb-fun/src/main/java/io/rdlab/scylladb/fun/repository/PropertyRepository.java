@@ -10,6 +10,7 @@ import com.datastax.oss.driver.api.core.cql.Row;
 import com.datastax.oss.driver.api.core.cql.SimpleStatement;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.datastax.oss.driver.api.querybuilder.relation.Relation;
+import com.datastax.oss.driver.api.querybuilder.select.Selector;
 import io.rdlab.scylladb.fun.model.Property;
 import io.rdlab.scylladb.fun.service.RowCollector;
 import org.springframework.boot.autoconfigure.cassandra.CassandraProperties;
@@ -41,6 +42,7 @@ public class PropertyRepository {
     private final PreparedStatement insertPreparedStatement;
     private final PreparedStatement findByIdPreparedStatement;
     private final PreparedStatement findByDataPreparedStatement;
+    private final PreparedStatement maxFrequencyTextPreparedStatement;
 
     public PropertyRepository(
             CassandraProperties properties,
@@ -56,6 +58,7 @@ public class PropertyRepository {
         this.insertPreparedStatement = session.prepare(createInsertStatement());
         this.findByIdPreparedStatement = session.prepare(createFindByIdStatement());
         this.findByDataPreparedStatement = session.prepare(createFindByDataStatement());
+        this.maxFrequencyTextPreparedStatement = session.prepare(createMaxFrequencyTextStatement());
     }
 
     public CompletionStage<Property> save(Property property) {
@@ -93,6 +96,24 @@ public class PropertyRepository {
                 .thenApply(rows -> rows.stream().map(rowMapper));
     }
 
+    public CompletionStage<Optional<String>> maxFrequencyText(
+            String group,
+            String name,
+            Instant start,
+            Instant end
+    ) {
+        BoundStatement bound = maxFrequencyTextPreparedStatement.bind(group, name, start, end);
+        CompletionStage<AsyncResultSet> stage = session.executeAsync(bound);
+        return stage
+                .thenApply(AsyncPagingIterable::one)
+                .thenApply(Optional::ofNullable)
+                .thenApply(this::maxFrequencyExtractFunction);
+    }
+
+    private Optional<String> maxFrequencyExtractFunction(Optional<Row> row) {
+        return row.map(r -> r.getString(0));
+    }
+
     private SimpleStatement createInsertStatement() {
         return QueryBuilder.insertInto(keyspace, PROPERTY)
                 .value(GROUP, bindMarker(GROUP))
@@ -118,6 +139,17 @@ public class PropertyRepository {
                 .columns(
                         GROUP, NAME, DATE, VALUE_STRING
                 )
+                .where(
+                        Relation.column(GROUP).isEqualTo(bindMarker(GROUP)),
+                        Relation.column(NAME).isEqualTo(bindMarker(NAME)),
+                        Relation.column(DATE).isGreaterThanOrEqualTo(bindMarker(START)),
+                        Relation.column(DATE).isLessThan(bindMarker(END)))
+                .build();
+    }
+
+    private SimpleStatement createMaxFrequencyTextStatement() {
+        return QueryBuilder.selectFrom(keyspace, PROPERTY)
+                .function("max_frequency_text", Selector.column(VALUE_STRING))
                 .where(
                         Relation.column(GROUP).isEqualTo(bindMarker(GROUP)),
                         Relation.column(NAME).isEqualTo(bindMarker(NAME)),
