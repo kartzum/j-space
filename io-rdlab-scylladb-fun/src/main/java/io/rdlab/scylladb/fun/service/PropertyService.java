@@ -21,7 +21,7 @@ public interface PropertyService {
             long limit
     );
 
-    CompletionStage<Optional<String>> maxFrequencyText(
+    CompletionStage<Optional<String>> mostCommonText(
             String group,
             String name,
             Instant start,

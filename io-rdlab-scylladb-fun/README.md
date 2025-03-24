@@ -2,11 +2,11 @@
 There are examples of Cassandra/ScyllaDB with Spring Boot 3.
 
 ## Functions. UDF/UDA
-There is example of UDA for calculating most frequency value in text column type.
+There is example of UDA for calculating most common value in text column type.
 This example use custom type based on "map" and "{}" for INITCOND.
 
 ```
-SELECT max_frequency_text(value_string) FROM dt.property WHERE group=:group AND name=:name AND date>=:start AND date<:end
+SELECT most_common_text(value_string) FROM dt.property WHERE group=:group AND name=:name AND date>=:start AND date<:end
 ```
 
 * See: CassandraPreConstructSessionEntitiesInitializer

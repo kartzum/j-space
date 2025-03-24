@@ -58,14 +58,14 @@ public class PropertyController {
         return propertyService.findByData(group, name, start, end, offset, limit);
     }
 
-    @GetMapping("/max-frequency-text")
-    public CompletionStage<ResponseEntity<String>> maxFrequencyText(
+    @GetMapping("/most-common-text")
+    public CompletionStage<ResponseEntity<String>> mostCommonText(
             @RequestParam(name = "group") String group,
             @RequestParam(name = "name") String name,
             @RequestParam(name = "start") Instant start,
             @RequestParam(name = "end") Instant end
     ) {
-        return propertyService.maxFrequencyText(group, name, start, end)
+        return propertyService.mostCommonText(group, name, start, end)
                 .thenApply(
                         p -> p.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build())
                 );

@@ -35,9 +35,9 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
-    public CompletionStage<Optional<String>> maxFrequencyText(
+    public CompletionStage<Optional<String>> mostCommonText(
             String group, String name, Instant start, Instant end
     ) {
-        return propertyRepository.maxFrequencyText(group, name, start, end);
+        return propertyRepository.mostCommonText(group, name, start, end);
     }
 }

@@ -42,7 +42,7 @@ public class PropertyRepository {
     private final PreparedStatement insertPreparedStatement;
     private final PreparedStatement findByIdPreparedStatement;
     private final PreparedStatement findByDataPreparedStatement;
-    private final PreparedStatement maxFrequencyTextPreparedStatement;
+    private final PreparedStatement mostCommonTextPreparedStatement;
 
     public PropertyRepository(
             CassandraProperties properties,
@@ -58,7 +58,7 @@ public class PropertyRepository {
         this.insertPreparedStatement = session.prepare(createInsertStatement());
         this.findByIdPreparedStatement = session.prepare(createFindByIdStatement());
         this.findByDataPreparedStatement = session.prepare(createFindByDataStatement());
-        this.maxFrequencyTextPreparedStatement = session.prepare(createMaxFrequencyTextStatement());
+        this.mostCommonTextPreparedStatement = session.prepare(createMostCommonTextStatement());
     }
 
     public CompletionStage<Property> save(Property property) {
@@ -96,21 +96,21 @@ public class PropertyRepository {
                 .thenApply(rows -> rows.stream().map(rowMapper));
     }
 
-    public CompletionStage<Optional<String>> maxFrequencyText(
+    public CompletionStage<Optional<String>> mostCommonText(
             String group,
             String name,
             Instant start,
             Instant end
     ) {
-        BoundStatement bound = maxFrequencyTextPreparedStatement.bind(group, name, start, end);
+        BoundStatement bound = mostCommonTextPreparedStatement.bind(group, name, start, end);
         CompletionStage<AsyncResultSet> stage = session.executeAsync(bound);
         return stage
                 .thenApply(AsyncPagingIterable::one)
                 .thenApply(Optional::ofNullable)
-                .thenApply(this::maxFrequencyExtractFunction);
+                .thenApply(this::mostCommonExtractFunction);
     }
 
-    private Optional<String> maxFrequencyExtractFunction(Optional<Row> row) {
+    private Optional<String> mostCommonExtractFunction(Optional<Row> row) {
         return row.map(r -> r.getString(0));
     }
 
@@ -147,9 +147,9 @@ public class PropertyRepository {
                 .build();
     }
 
-    private SimpleStatement createMaxFrequencyTextStatement() {
+    private SimpleStatement createMostCommonTextStatement() {
         return QueryBuilder.selectFrom(keyspace, PROPERTY)
-                .function("max_frequency_text", Selector.column(VALUE_STRING))
+                .function("most_common_text", Selector.column(VALUE_STRING))
                 .where(
                         Relation.column(GROUP).isEqualTo(bindMarker(GROUP)),
                         Relation.column(NAME).isEqualTo(bindMarker(NAME)),

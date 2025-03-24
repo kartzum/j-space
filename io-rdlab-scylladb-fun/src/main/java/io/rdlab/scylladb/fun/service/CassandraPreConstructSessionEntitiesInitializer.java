@@ -22,10 +22,10 @@ public class CassandraPreConstructSessionEntitiesInitializer implements Cassandr
 
         session.execute(createPropertyTableStatement(keyspace));
 
-        session.execute(maxFrequencyDataTextType());
-        session.execute(maxFrequencyTextAccumulate());
-        session.execute(maxFrequencyTextCalculate());
-        session.execute(maxFrequencyText());
+        session.execute(mostCommonDataTextType());
+        session.execute(mostCommonTextAccumulate());
+        session.execute(mostCommonTextCalculate());
+        session.execute(mostCommonText());
     }
 
     private SimpleStatement createPropertyTableStatement(CqlIdentifier keyspace) {
@@ -39,15 +39,15 @@ public class CassandraPreConstructSessionEntitiesInitializer implements Cassandr
                 .build();
     }
 
-    private String maxFrequencyDataTextType() {
-        return "create type if not exists max_frequency_text_data ( text_data frozen<map<text, bigint>> );";
+    private String mostCommonDataTextType() {
+        return "create type if not exists most_common_text_data ( text_data frozen<map<text, bigint>> );";
     }
 
-    private String maxFrequencyTextAccumulate() {
+    private String mostCommonTextAccumulate() {
         return """
-                CREATE OR REPLACE FUNCTION max_frequency_text_accumulate(storage max_frequency_text_data, val text)
+                CREATE OR REPLACE FUNCTION most_common_text_accumulate(storage most_common_text_data, val text)
                 RETURNS NULL ON NULL INPUT
-                RETURNS max_frequency_text_data
+                RETURNS most_common_text_data
                 LANGUAGE lua
                 AS $$
                     if storage == nil then
@@ -69,9 +69,9 @@ public class CassandraPreConstructSessionEntitiesInitializer implements Cassandr
                 """;
     }
 
-    private String maxFrequencyTextCalculate() {
+    private String mostCommonTextCalculate() {
         return """
-                CREATE OR REPLACE FUNCTION max_frequency_text_calculate(storage max_frequency_text_data)
+                CREATE OR REPLACE FUNCTION most_common_text_calculate(storage most_common_text_data)
                 RETURNS NULL ON NULL INPUT
                 RETURNS text
                 LANGUAGE lua AS $$
@@ -91,12 +91,12 @@ public class CassandraPreConstructSessionEntitiesInitializer implements Cassandr
                 """;
     }
 
-    private String maxFrequencyText() {
+    private String mostCommonText() {
         return """
-                CREATE OR REPLACE AGGREGATE max_frequency_text(text)
-                   SFUNC max_frequency_text_accumulate
-                   STYPE max_frequency_text_data
-                   FINALFUNC max_frequency_text_calculate
+                CREATE OR REPLACE AGGREGATE most_common_text(text)
+                   SFUNC most_common_text_accumulate
+                   STYPE most_common_text_data
+                   FINALFUNC most_common_text_calculate
                    INITCOND {text_data: {}};
                 """;
     }

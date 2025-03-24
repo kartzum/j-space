@@ -104,7 +104,7 @@ public class PropertyControllerTests extends ContainersRunner {
     }
 
     @Test
-    void shouldCalculateMaxFrequencyText() {
+    void shouldCalculateMostCommonText() {
         template.postForEntity(baseUri, PROPERTY_1, Property.class);
         template.postForEntity(baseUri, PROPERTY_2, Property.class);
         template.postForEntity(baseUri, PROPERTY_3, Property.class);
@@ -112,14 +112,14 @@ public class PropertyControllerTests extends ContainersRunner {
         template.postForEntity(baseUri, PROPERTY_5, Property.class);
 
         URI uri = UriComponentsBuilder.fromUri(baseUri)
-                .path("/max-frequency-text")
+                .path("/most-common-text")
                 .queryParam("group", "g")
                 .queryParam("name", "a")
                 .queryParam("start", "2024")
                 .queryParam("end", "2026")
                 .build().toUri();
 
-        String maxFrequencyText = template.getForObject(uri, String.class);
-        assertEquals("data_2", maxFrequencyText);
+        String text = template.getForObject(uri, String.class);
+        assertEquals("data_2", text);
     }
 }
