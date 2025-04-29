@@ -97,8 +97,10 @@ public class PropertyRepository {
                 .whenComplete((propertyOpt, exception) -> {
                     if (exception == null) {
                         metrics.propertyFindByIdTimerRegister(startTime);
+                        metrics.propertyFindByIdCounterRegister();
                     } else {
                         metrics.propertyFindByIdWithErrorTimerRegister(startTime);
+                        metrics.propertyFindByIdWithErrorCounterRegister();
                     }
                 });
     }

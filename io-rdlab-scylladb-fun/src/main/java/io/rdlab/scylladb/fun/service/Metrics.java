@@ -9,6 +9,10 @@ public interface Metrics {
 
     void propertyFindByIdWithErrorTimerRegister(long start);
 
+    void propertyFindByIdCounterRegister();
+
+    void propertyFindByIdWithErrorCounterRegister();
+
     void propertyFindByDataTimerRegister(long start);
 
     void propertyFindByDataWithErrorTimerRegister(long start);

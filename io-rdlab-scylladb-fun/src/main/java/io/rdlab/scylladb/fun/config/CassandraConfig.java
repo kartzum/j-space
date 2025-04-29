@@ -9,58 +9,38 @@ import org.springframework.boot.autoconfigure.cassandra.CassandraProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.data.cassandra.config.AbstractCassandraConfiguration;
-import org.springframework.data.cassandra.config.CqlSessionFactoryBean;
 import org.springframework.data.cassandra.core.cql.session.init.ResourceKeyspacePopulator;
 
 import java.net.InetSocketAddress;
 
 @Configuration
-public class CassandraConfig extends AbstractCassandraConfiguration {
+public class CassandraConfig {
     private final CassandraProperties properties;
     private final CassandraConnectionDetails connectionDetails;
 
-    public CassandraConfig(CassandraProperties properties, CassandraConnectionDetails connectionDetails) {
+    public CassandraConfig(
+            CassandraProperties properties,
+            CassandraConnectionDetails connectionDetails
+    ) {
         this.properties = properties;
         this.connectionDetails = connectionDetails;
     }
 
-    @Override
-    protected String getKeyspaceName() {
-        return properties.getKeyspaceName();
-    }
-
-    @Override
-    protected String getLocalDataCenter() {
-        return properties.getLocalDatacenter();
-    }
-
-    @Override
-    protected int getPort() {
-        return properties.getPort();
-    }
-
-    @Override
-    protected String getContactPoints() {
-        return String.join(",", properties.getContactPoints());
-    }
-
     @Bean
-    @Override
-    public CqlSessionFactoryBean cassandraSession() {
-        prepareSession();
-        return super.cassandraSession();
+    public CqlSession cassandraSession(CqlSessionBuilder cqlSessionBuilder) {
+        executeSupportSetup();
+        return cqlSessionBuilder.build();
     }
 
-    private void prepareSession() {
-        try (CqlSession session = createCqlSession()) {
+    private void executeSupportSetup() {
+        try (CqlSession session = createSupportSession()) {
             session.execute(createKeyspaceStatement(properties.getKeyspaceName()));
             session.execute("USE " + properties.getKeyspaceName());
             createResourceKeyspacePopulator().populate(session);
         }
     }
 
-    private CqlSession createCqlSession() {
+    private CqlSession createSupportSession() {
         CqlSessionBuilder sessionBuilder = CqlSession.builder();
         for (CassandraConnectionDetails.Node node : connectionDetails.getContactPoints()) {
             InetSocketAddress address = InetSocketAddress.createUnresolved(node.host(), node.port());
