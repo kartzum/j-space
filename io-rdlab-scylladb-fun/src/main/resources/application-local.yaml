@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: fun
+  cassandra:
+    contact-points: 127.0.0.1
+    keyspace-name: dt
+    local-datacenter: datacenter1
+    port: 9042
+
+server:
+  port: 8093

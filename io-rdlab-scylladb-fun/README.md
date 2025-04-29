@@ -1,6 +1,20 @@
 # io-rdlab-scylladb-fun
 There are examples of Cassandra/ScyllaDB with Spring Boot 3.
 
+## Local run and samples
+
+Add property.
+```
+curl -l 'localhost:8093/api/v1/property' \
+--header 'Content-Type: application/json' \
+--data-raw '{"group": "g", "name": "a", "date": "20250101000000000", "valueString": "data_1"}'
+```
+
+Get property.
+```
+curl -l 'localhost:8093/api/v1/property/g/a/20250101000000000'
+```
+
 ## Functions. UDF/UDA
 There is example of UDA for calculating most common value in text column type.
 This example use custom type based on "map" and "{}" for INITCOND.
