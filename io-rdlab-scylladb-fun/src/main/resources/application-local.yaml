@@ -9,3 +9,9 @@ spring:
 
 server:
   port: 8093
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: info,health,prometheus

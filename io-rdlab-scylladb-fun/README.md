@@ -14,6 +14,51 @@ Get property.
 ```
 curl -l 'localhost:8093/api/v1/property/g/a/20250101000000000'
 ```
+## Metrics
+
+Get info about 'findById'.
+```
+curl -l 'localhost:8093/actuator/prometheus' | grep property
+```
+Responses.
+```
+# HELP propertyFindByData_seconds  
+# TYPE propertyFindByData_seconds summary
+propertyFindByData_seconds_count{exception="Error"} 0
+propertyFindByData_seconds_sum{exception="Error"} 0.0
+propertyFindByData_seconds_count{exception="none"} 0
+propertyFindByData_seconds_sum{exception="none"} 0.0
+# HELP propertyFindByData_seconds_max  
+# TYPE propertyFindByData_seconds_max gauge
+propertyFindByData_seconds_max{exception="Error"} 0.0
+propertyFindByData_seconds_max{exception="none"} 0.0
+# HELP propertyFindById_seconds  
+# TYPE propertyFindById_seconds summary
+propertyFindById_seconds_count{exception="Error"} 0
+propertyFindById_seconds_sum{exception="Error"} 0.0
+propertyFindById_seconds_count{exception="none"} 0
+propertyFindById_seconds_sum{exception="none"} 0.0
+# HELP propertyFindById_seconds_max  
+# TYPE propertyFindById_seconds_max gauge
+propertyFindById_seconds_max{exception="Error"} 0.0
+propertyFindById_seconds_max{exception="none"} 0.0
+...
+```
+```
+...
+# HELP propertyFindById_seconds  
+# TYPE propertyFindById_seconds summary
+propertyFindById_seconds_count{exception="Error"} 0
+propertyFindById_seconds_sum{exception="Error"} 0.0
+propertyFindById_seconds_count{exception="none"} 8
+propertyFindById_seconds_sum{exception="none"} 0.027
+# HELP propertyFindById_seconds_max  
+# TYPE propertyFindById_seconds_max gauge
+propertyFindById_seconds_max{exception="Error"} 0.0
+propertyFindById_seconds_max{exception="none"} 0.014
+...
+```
+
 
 ## Functions. UDF/UDA
 There is example of UDA for calculating most common value in text column type.
@@ -491,3 +536,5 @@ SELECT propertyexp.most_common_text(value_string) FROM propertyexp.property WHER
 * [Scylladb. Functions](https://opensource.docs.scylladb.com/stable/cql/functions.html)
 * [Scylladb. Video-streaming-app](https://www.scylladb.com/2024/01/09/build-a-low-latency-video-streaming-app/)
 * [Scylladb. Aggregates](https://www.scylladb.com/2023/06/20/how-scylladb-distributed-aggregates-reduce-query-execution-time-up-to-20x/)
+* https://www.baeldung.com/spring-boot-actuators
+* https://github.com/hendisantika/spring-boot-prometheus-grafana/blob/master/README.md

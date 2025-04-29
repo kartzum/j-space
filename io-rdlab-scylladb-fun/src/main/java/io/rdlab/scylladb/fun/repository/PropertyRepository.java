@@ -12,6 +12,7 @@ import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.datastax.oss.driver.api.querybuilder.relation.Relation;
 import com.datastax.oss.driver.api.querybuilder.select.Selector;
 import io.rdlab.scylladb.fun.model.Property;
+import io.rdlab.scylladb.fun.service.Metrics;
 import io.rdlab.scylladb.fun.service.RowCollector;
 import org.springframework.boot.autoconfigure.cassandra.CassandraProperties;
 import org.springframework.stereotype.Repository;
@@ -44,10 +45,13 @@ public class PropertyRepository {
     private final PreparedStatement findByDataPreparedStatement;
     private final PreparedStatement mostCommonTextPreparedStatement;
 
+    private final Metrics metrics;
+
     public PropertyRepository(
             CassandraProperties properties,
             CqlSession session,
-            Function<Row, Property> rowMapper
+            Function<Row, Property> rowMapper,
+            Metrics metrics
     ) {
         this.keyspace = CqlIdentifier.fromInternal(properties.getKeyspaceName());
 
@@ -59,6 +63,8 @@ public class PropertyRepository {
         this.findByIdPreparedStatement = session.prepare(createFindByIdStatement());
         this.findByDataPreparedStatement = session.prepare(createFindByDataStatement());
         this.mostCommonTextPreparedStatement = session.prepare(createMostCommonTextStatement());
+
+        this.metrics = metrics;
     }
 
     public CompletionStage<Property> save(Property property) {
@@ -68,17 +74,33 @@ public class PropertyRepository {
                 property.getDate(),
                 property.getValueString()
         );
+        long startTime = Instant.now().toEpochMilli();
         CompletionStage<AsyncResultSet> stage = session.executeAsync(bound);
-        return stage.thenApply(rs -> property);
+        return stage.thenApply(rs -> property)
+                .whenComplete((propertyOpt, exception) -> {
+                    if (exception == null) {
+                        metrics.propertySaveTimerRegister(startTime);
+                    } else {
+                        metrics.propertySaveWithErrorTimerRegister(startTime);
+                    }
+                });
     }
 
     public CompletionStage<Optional<Property>> findById(String group, String name, Instant date) {
+        long startTime = Instant.now().toEpochMilli();
         BoundStatement bound = findByIdPreparedStatement.bind(group, name, date);
         CompletionStage<AsyncResultSet> stage = session.executeAsync(bound);
         return stage
                 .thenApply(AsyncPagingIterable::one)
                 .thenApply(Optional::ofNullable)
-                .thenApply(optional -> optional.map(rowMapper));
+                .thenApply(optional -> optional.map(rowMapper))
+                .whenComplete((propertyOpt, exception) -> {
+                    if (exception == null) {
+                        metrics.propertyFindByIdTimerRegister(startTime);
+                    } else {
+                        metrics.propertyFindByIdWithErrorTimerRegister(startTime);
+                    }
+                });
     }
 
     public CompletionStage<Stream<Property>> findByData(
@@ -89,11 +111,19 @@ public class PropertyRepository {
             long offset,
             long limit
     ) {
+        long startTime = Instant.now().toEpochMilli();
         BoundStatement bound = findByDataPreparedStatement.bind(group, name, start, end);
         CompletionStage<AsyncResultSet> stage = session.executeAsync(bound);
         return stage
                 .thenCompose(first -> new RowCollector(first, offset, limit))
-                .thenApply(rows -> rows.stream().map(rowMapper));
+                .thenApply(rows -> rows.stream().map(rowMapper))
+                .whenComplete((propertyOpt, exception) -> {
+                    if (exception == null) {
+                        metrics.propertyFindByDataTimerRegister(startTime);
+                    } else {
+                        metrics.propertyFindByDataWithErrorTimerRegister(startTime);
+                    }
+                });
     }
 
     public CompletionStage<Optional<String>> mostCommonText(
@@ -102,12 +132,20 @@ public class PropertyRepository {
             Instant start,
             Instant end
     ) {
+        long startTime = Instant.now().toEpochMilli();
         BoundStatement bound = mostCommonTextPreparedStatement.bind(group, name, start, end);
         CompletionStage<AsyncResultSet> stage = session.executeAsync(bound);
         return stage
                 .thenApply(AsyncPagingIterable::one)
                 .thenApply(Optional::ofNullable)
-                .thenApply(this::mostCommonExtractFunction);
+                .thenApply(this::mostCommonExtractFunction)
+                .whenComplete((propertyOpt, exception) -> {
+                    if (exception == null) {
+                        metrics.propertyMostCommonTextTimerRegister(startTime);
+                    } else {
+                        metrics.propertyMostCommonTextWithErrorTimerRegister(startTime);
+                    }
+                });
     }
 
     private Optional<String> mostCommonExtractFunction(Optional<Row> row) {
