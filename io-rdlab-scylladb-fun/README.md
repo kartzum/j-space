@@ -14,7 +14,17 @@ Get property.
 ```
 curl -l 'localhost:8080/api/v1/property/g/a/20250101000000000'
 ```
-## Metrics
+
+```
+curl -l 'localhost:8080/api/v1/property/find?group=g&name=a&start=20250101000000000&end=20250101000000900&offset=0&limit=10'
+```
+
+## Cassandra/ScyllaDB. Async
+* https://github.com/apache/cassandra-java-driver/blob/4.x/manual/core/async/README.md
+
+## Cassandra/ScyllaDB. Metrics
+
+* https://github.com/apache/cassandra-java-driver/blob/4.x/manual/core/metrics/README.md
 
 Get info about 'findById'.
 ```
@@ -67,8 +77,21 @@ Rate.
 rate(propertyFindByIdTimer_seconds_count {exception="none"}[1m])
 ```
 
+```
+rate(propertyFindByDataTimer_seconds_count {exception="none"}[1m])
+```
 
-## Functions. UDF/UDA
+## Load testing
+See:
+* https://jmeter.apache.org/index.html
+* https://jmeter.apache.org/usermanual/build-web-test-plan.html
+
+## Cassandra/ScyllaDB. Performance
+See:
+* https://github.com/apache/cassandra-java-driver/blob/4.x/manual/core/performance/README.md
+* https://github.com/apache/cassandra-java-driver/tree/4.x/manual/core/pooling#tuning
+
+## Cassandra/ScyllaDB. Functions. UDF/UDA
 There is example of UDA for calculating most common value in text column type.
 This example use custom type based on "map" and "{}" for INITCOND.
 

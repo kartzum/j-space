@@ -1,3 +1,12 @@
+app:
+  cassandra:
+    driver:
+      config:
+        enabled: true
+      advanced:
+        #netty.io-group.size: 10
+        #connection.pool.local.size: 10
+
 spring:
   application:
     name: fun
