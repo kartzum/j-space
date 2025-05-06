@@ -4,9 +4,16 @@ app:
       config:
         enabled: true
       advanced:
-        #netty.io-group.size: 10
-        #connection.pool.local.size: 10
-
+        netty.io-group.size: 10
+        connection:
+          pool:
+            local.size: 8
+        metrics:
+          session: connected-nodes,cql-requests
+          node: pool.open-connections,pool.available-streams
+      basic:
+        request:
+        #timeout: PT5S
 spring:
   application:
     name: fun

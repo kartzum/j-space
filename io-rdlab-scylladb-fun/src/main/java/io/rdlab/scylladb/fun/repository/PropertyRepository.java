@@ -44,6 +44,7 @@ public class PropertyRepository {
     private final PreparedStatement findByIdPreparedStatement;
     private final PreparedStatement findByDataPreparedStatement;
     private final PreparedStatement mostCommonTextPreparedStatement;
+    private final PreparedStatement countAllByDataPreparedStatement;
 
     private final Metrics metrics;
 
@@ -63,6 +64,7 @@ public class PropertyRepository {
         this.findByIdPreparedStatement = session.prepare(createFindByIdStatement());
         this.findByDataPreparedStatement = session.prepare(createFindByDataStatement());
         this.mostCommonTextPreparedStatement = session.prepare(createMostCommonTextStatement());
+        this.countAllByDataPreparedStatement = session.prepare(createCountAllByDataStatement());
 
         this.metrics = metrics;
     }
@@ -128,6 +130,20 @@ public class PropertyRepository {
                 });
     }
 
+    public CompletionStage<Optional<Long>> countAllByData(
+            String group,
+            String name,
+            Instant start,
+            Instant end
+    ) {
+        BoundStatement bound = countAllByDataPreparedStatement.bind(group, name, start, end);
+        CompletionStage<AsyncResultSet> stage = session.executeAsync(bound);
+        return stage
+                .thenApply(AsyncPagingIterable::one)
+                .thenApply(Optional::ofNullable)
+                .thenApply(this::countAllExtractFunction);
+    }
+
     public CompletionStage<Optional<String>> mostCommonText(
             String group,
             String name,
@@ -152,6 +168,10 @@ public class PropertyRepository {
 
     private Optional<String> mostCommonExtractFunction(Optional<Row> row) {
         return row.map(r -> r.getString(0));
+    }
+
+    private Optional<Long> countAllExtractFunction(Optional<Row> row) {
+        return row.map(r -> r.getLong(0));
     }
 
     private SimpleStatement createInsertStatement() {
@@ -179,6 +199,17 @@ public class PropertyRepository {
                 .columns(
                         GROUP, NAME, DATE, VALUE_STRING
                 )
+                .where(
+                        Relation.column(GROUP).isEqualTo(bindMarker(GROUP)),
+                        Relation.column(NAME).isEqualTo(bindMarker(NAME)),
+                        Relation.column(DATE).isGreaterThanOrEqualTo(bindMarker(START)),
+                        Relation.column(DATE).isLessThan(bindMarker(END)))
+                .build();
+    }
+
+    private SimpleStatement createCountAllByDataStatement() {
+        return QueryBuilder.selectFrom(keyspace, PROPERTY)
+                .countAll()
                 .where(
                         Relation.column(GROUP).isEqualTo(bindMarker(GROUP)),
                         Relation.column(NAME).isEqualTo(bindMarker(NAME)),

@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.cassandra.DriverConfigLoaderBuilde
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 
@@ -41,6 +42,9 @@ public class CassandraDriverConfigLoaderBuilderCustomizer implements DriverConfi
 
     @Value("${app.cassandra.driver.advanced.metrics.node:#{null}}")
     private String metricsNode;
+
+    @Value("${app.cassandra.driver.basic.request.timeout:#{null}}")
+    private String timeout;
 
     @Override
     public void customize(ProgrammaticDriverConfigLoaderBuilder builder) {
@@ -79,6 +83,10 @@ public class CassandraDriverConfigLoaderBuilderCustomizer implements DriverConfi
             builder.withStringList(DefaultDriverOption.METRICS_NODE_ENABLED,
                     metricsNode.contains(SEPARATOR) ? Arrays.stream(metricsNode.split(SEPARATOR)).toList()
                             : List.of(metricsNode));
+        }
+
+        if (timeout != null && !timeout.isBlank()) {
+            builder.withDuration(DefaultDriverOption.REQUEST_TIMEOUT, Duration.parse(timeout));
         }
     }
 }

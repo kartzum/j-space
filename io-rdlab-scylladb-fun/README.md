@@ -3,20 +3,24 @@ There are examples of Cassandra/ScyllaDB with Spring Boot 3.
 
 ## Local run and samples
 
-Add property.
+Add "property".
 ```
 curl -l 'localhost:8080/api/v1/property' \
 --header 'Content-Type: application/json' \
 --data-raw '{"group": "g", "name": "a", "date": "20250101000000000", "valueString": "data_1"}'
 ```
 
-Get property.
+Get/find... "property" and.
 ```
 curl -l 'localhost:8080/api/v1/property/g/a/20250101000000000'
 ```
 
 ```
 curl -l 'localhost:8080/api/v1/property/find?group=g&name=a&start=20250101000000000&end=20250101000000900&offset=0&limit=10'
+```
+
+```
+curl -l 'localhost:8080/api/v1/property/count-all?group=g&name=a_9&start=20250101000000000&end=20250101000000900'
 ```
 
 ## Cassandra/ScyllaDB. Async
@@ -72,13 +76,29 @@ propertyFindByIdTimer_seconds_count{exception="none"} 7
 propertyFindByIdTimer_seconds_sum{exception="none"} 0.034
 ...
 ```
-Rate.
+Rate and others.
 ```
 rate(propertyFindByIdTimer_seconds_count {exception="none"}[1m])
+
+rate(propertyFindByDataTimer_seconds_count {exception="none"}[1m])
+rate(propertyFindByDataTimer_seconds_count {exception="Error"}[1m])
+
+rate(propertySaveTimer_seconds_count {exception="none"}[1m])
+
+rate(propertyMostCommonTextTimer_seconds_count {exception="none"}[1m])
+rate(propertyMostCommonTextTimer_seconds_count {exception="Error"}[1m])
 ```
 
 ```
-rate(propertyFindByDataTimer_seconds_count {exception="none"}[1m])
+rate(cassandra_session_cql_requests_seconds_count[1m])
+
+cassandra_nodes_pool_open_connections
+
+cassandra_nodes_pool_available_streams
+```
+
+```
+process_cpu_usage
 ```
 
 ## Load testing
@@ -86,10 +106,16 @@ See:
 * https://jmeter.apache.org/index.html
 * https://jmeter.apache.org/usermanual/build-web-test-plan.html
 
+Plans:
+* fun-property-put-1.jmx
+* fun-property-find-1.jmx
+* fun-property-most-common-text-1.jmx
+
 ## Cassandra/ScyllaDB. Performance
 See:
 * https://github.com/apache/cassandra-java-driver/blob/4.x/manual/core/performance/README.md
 * https://github.com/apache/cassandra-java-driver/tree/4.x/manual/core/pooling#tuning
+* https://docs.datastax.com/en/developer/java-driver/4.4/manual/core/configuration/reference/index.html
 
 ## Cassandra/ScyllaDB. Functions. UDF/UDA
 There is example of UDA for calculating most common value in text column type.
@@ -557,6 +583,36 @@ SELECT propertyexp.most_common_text(value_string) FROM propertyexp.property WHER
 
 (1 rows)
 ```
+
+## Cassandra/ScyllaDB. Performance experiments
+### find
+
+* fun-property-put-1.jmx
+* fun-property-find-1.jmx
+
+```
+a_0: 35
+a_1: 52
+a_2: 38
+a_3: 46
+a_4: 43
+a_5: 46
+a_6: 37
+a_7: 44
+a_8: 40
+a_9: 40
+```
+
+**default**
+```
+advanced.netty.io-group.size: 0
+advanced.connection.pool.local.size: 1
+```
+**1400/50**
+```
+{"timestamp":"2025-05-06T15:42:05.520","level":"ERROR","thread":"http-nio-8080-exec-301","logger":"o.a.c.c.C.[.[.[/].[dispatcherServlet]","message":"Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception [Request processing failed: com.datastax.oss.driver.api.core.AllNodesFailedException: All 1 node(s) tried for the query failed (showing first 1 nodes, use getAllErrors() for more): Node(endPoint=/127.0.0.1:9042, hostId=97eb30d1-e48b-423c-b8c9-673c55346133, hashCode=115a69e4): [com.datastax.oss.driver.api.core.NodeUnavailableException: No connection was available to Node(endPoint=/127.0.0.1:9042, hostId=97eb30d1-e48b-423c-b8c9-673c55346133, hashCode=115a69e4)]] with root cause","traceId":"","spanId":"","stackTrace":"com.datastax.oss.driver.api.core.AllNodesFailedException: All 1 node(s) tried for the query failed (showing first 1 nodes, use getAllErrors() for more): Node(endPoint=/127.0.0.1:9042, hostId=97eb30d1-e48b-423c-b8c9-673c55346133, hashCode=115a69e4): [com.datastax.oss.driver.api.core.NodeUnavailableException: No connection was available to Node(endPoint=/127.0.0.1:9042, hostId=97eb30d1-e48b-423c-b8c9-673c55346133, hashCode=115a69e4)]\n\tat com.datastax.oss.driver.api.core.AllNodesFailedException.fromErrors(AllNodesFailedException.java:57)\n\tat com.datastax.oss.driver.internal.core.cql.CqlRequestHandler.sendRequest(CqlRequestHandler.java:266)\n\tat com.datastax.oss.driver.internal.core.cql.CqlRequestHandler.onThrottleReady(CqlRequestHandler.java:197)\n\tat com.datastax.oss.driver.internal.core.session.throttling.PassThroughRequestThrottler.register(PassThroughRequestThrottler.java:54)\n\tat com.datastax.oss.driver.internal.core.cql.CqlRequestHandler.<init>(CqlRequestHandler.java:174)\n\tat com.datastax.oss.driver.internal.core.cql.CqlRequestAsyncProcessor.process(CqlRequestAsyncProcessor.java:46)\n\tat com.datastax.oss.driver.internal.core.cql.CqlRequestAsyncProcessor.process(CqlRequestAsyncProcessor.java:31)\n\tat com.datastax.oss.driver.internal.core.session.DefaultSession.execute(DefaultSession.java:234)\n\tat com.datastax.oss.driver.api.core.cql.AsyncCqlSession.executeAsync(AsyncCqlSession.java:44)\n\tat io.rdlab.scylladb.fun.repository.PropertyRepository.findByData(PropertyRepository.java:118)\n\tat java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)\n\tat java.base/java.lang.reflect.Method.invoke(Method.java:565)\n\tat org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:359)\n\tat org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)\n\tat org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)\n\tat org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:138)\n\tat org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)\n\tat org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:728)\n\tat io.rdlab.scylladb.fun.repository.PropertyRepository$$SpringCGLIB$$0.findByData(<generated>)\n\tat io.rdlab.scylladb.fun.service.PropertyServiceImpl.findByData(PropertyServiceImpl.java:34)\n\tat io.rdlab.scylladb.fun.controller.PropertyController.find(PropertyController.java:58)\n\tat java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)\n\tat java.base/java.lang.reflect.Method.invoke(Method.java:565)\n\tat org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:258)\n\tat org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:191)\n\tat org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:118)\n\tat org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:986)\n\tat org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:891)\n\tat org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)\n\tat org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1089)\n\tat org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:979)\n\tat org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1014)\n\tat org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:903)\n\tat jakarta.servlet.http.HttpServlet.service(HttpServlet.java:564)\n\tat org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)\n\tat jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658)\n\tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:195)\n\tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)\n\tat org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51)\n\tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)\n\tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)\n\tat org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)\n\tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)\n\tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)\n\tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)\n\tat org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)\n\tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)\n\tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)\n\tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)\n\tat org.springframework.web.filter.ServerHttpObservationFilter.doFilterInternal(ServerHttpObservationFilter.java:114)\n\tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)\n\tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)\n\tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)\n\tat org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)\n\tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)\n\tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)\n\tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)\n\tat org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:167)\n\tat org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90)\n\tat org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:483)\n\tat org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:116)\n\tat org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93)\n\tat org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74)\n\tat org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:344)\n\tat org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:398)\n\tat org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)\n\tat org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:903)\n\tat org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1740)\n\tat org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)\n\tat org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1189)\n\tat org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:658)\n\tat org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63)\n\tat java.base/java.lang.Thread.run(Thread.java:1447)\n\tSuppressed: com.datastax.oss.driver.api.core.NodeUnavailableException: No connection was available to Node(endPoint=/127.0.0.1:9042, hostId=97eb30d1-e48b-423c-b8c9-673c55346133, hashCode=115a69e4)\n\t\tat com.datastax.oss.driver.internal.core.cql.CqlRequestHandler.sendRequest(CqlRequestHandler.java:258)\n\t\t... 71 common frames omitted\n"}
+```
+**1400/50_10/8**
 
 ## Links
 * [Accessing Data with Cassandra](https://spring.io/guides/gs/accessing-data-cassandra)

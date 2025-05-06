@@ -70,4 +70,17 @@ public class PropertyController {
                         p -> p.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build())
                 );
     }
+
+    @GetMapping("/count-all")
+    public CompletionStage<ResponseEntity<Long>> countAll(
+            @RequestParam(name = "group") String group,
+            @RequestParam(name = "name") String name,
+            @RequestParam(name = "start") Instant start,
+            @RequestParam(name = "end") Instant end
+    ) {
+        return propertyService.countAllByData(group, name, start, end)
+                .thenApply(
+                        p -> p.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build())
+                );
+    }
 }

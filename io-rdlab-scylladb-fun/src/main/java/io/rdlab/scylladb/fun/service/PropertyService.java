@@ -27,4 +27,11 @@ public interface PropertyService {
             Instant start,
             Instant end
     );
+
+    CompletionStage<Optional<Long>> countAllByData(
+            String group,
+            String name,
+            Instant start,
+            Instant end
+    );
 }

@@ -40,4 +40,9 @@ public class PropertyServiceImpl implements PropertyService {
     ) {
         return propertyRepository.mostCommonText(group, name, start, end);
     }
+
+    @Override
+    public CompletionStage<Optional<Long>> countAllByData(String group, String name, Instant start, Instant end) {
+        return propertyRepository.countAllByData(group, name, start, end);
+    }
 }
