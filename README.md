@@ -126,6 +126,9 @@ Servers.
 ### io-rdlab-scylladb-fun
 ScyllaDB examples.
 
+### io-rdlab-ic-mod
+langchain4j and so on examples.
+
 ## design
 
 ### microservices
