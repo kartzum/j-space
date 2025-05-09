@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: mod
+  ai:
+    model:
+      chat: ollama
+    ollama:
+      base-url: http://localhost:11434
+      chat:
+        options:
+          model: llama3.2:1b
+
+server:
+  port: 8080

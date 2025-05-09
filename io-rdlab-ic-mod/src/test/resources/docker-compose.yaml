@@ -1,0 +1,8 @@
+services:
+  ollama:
+    image: ollama/ollama:0.6.8
+    container_name: ollama_con
+    ports:
+      - 11434:11434
+    volumes:
+      - ./ollama:/root/.ollama
