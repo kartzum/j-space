@@ -5,6 +5,22 @@ Java Examples
 
 * [java-interview](https://github.com/enhorse/java-interview)
 
+## design
+
+### microservices
+* [API Gateway](https://habr.com/ru/companies/rosbank/articles/779770/)
+* [SAGA](https://learn.microsoft.com/ru-ru/azure/architecture/reference-architectures/saga/saga)
+
+### networks
+* https://selectel.ru/blog/osi-for-beginners/
+* https://habr.com/ru/articles/354408/
+* https://selectel.ru/blog/l3vpn-l2vpn/
+* https://habr.com/ru/articles/215117/
+* https://habr.com/ru/articles/258285/
+* [В чем разница между RPC и REST?](https://aws.amazon.com/ru/compare/the-difference-between-rpc-and-rest/)
+* [gRPC в качестве протокола межсервисного взаимодействия. Доклад Яндекса](https://habr.com/ru/companies/yandex/articles/484068/)
+* [Eventual Consistency vs. Strong Eventual Consistency vs. Strong Consistency](https://www.baeldung.com/cs/eventual-consistency-vs-strong-eventual-consistency-vs-strong-consistency)
+
 ## Projects
 
 ### g-start
@@ -129,19 +145,5 @@ ScyllaDB examples.
 ### io-rdlab-ic-mod
 langchain4j and so on examples.
 
-## design
-
-### microservices
-* [API Gateway](https://habr.com/ru/companies/rosbank/articles/779770/)
-* [SAGA](https://learn.microsoft.com/ru-ru/azure/architecture/reference-architectures/saga/saga)
-
-### networks
-* https://selectel.ru/blog/osi-for-beginners/
-* https://habr.com/ru/articles/354408/
-* https://selectel.ru/blog/l3vpn-l2vpn/
-* https://habr.com/ru/articles/215117/
-* https://habr.com/ru/articles/258285/
-* [В чем разница между RPC и REST?](https://aws.amazon.com/ru/compare/the-difference-between-rpc-and-rest/)
-* [gRPC в качестве протокола межсервисного взаимодействия. Доклад Яндекса](https://habr.com/ru/companies/yandex/articles/484068/)
-* [Eventual Consistency vs. Strong Eventual Consistency vs. Strong Consistency](https://www.baeldung.com/cs/eventual-consistency-vs-strong-eventual-consistency-vs-strong-consistency)
-
+### io-rdlab-net-ex
+Network examples.
