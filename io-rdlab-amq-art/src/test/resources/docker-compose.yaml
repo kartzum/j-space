@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  artemis:
+    image: apache/activemq-artemis:2.31.0-alpine
+    environment:
+      - ARTEMIS_USER=u
+      - ARTEMIS_PASSWORD=p
+    ports:
+      - "8161:8161"   # Web console
+      - "61616:61616" # Core protocol
+      - "5672:5672"   # AMQP
+      - "1883:1883"   # MQTT
+      - "1099:1099"   # JMX

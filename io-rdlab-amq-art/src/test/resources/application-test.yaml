@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: art
+
+  artemis:
+    mode: native
+    user: u
+    password: p
