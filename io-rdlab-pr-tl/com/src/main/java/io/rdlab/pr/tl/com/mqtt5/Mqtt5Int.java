@@ -2,7 +2,6 @@ package io.rdlab.pr.tl.com.mqtt5;
 
 import com.hivemq.client.mqtt.MqttClient;
 import com.hivemq.client.mqtt.mqtt5.Mqtt5AsyncClient;
-import com.hivemq.client.mqtt.mqtt5.message.publish.Mqtt5Publish;
 
 import java.net.InetAddress;
 import java.util.UUID;
@@ -33,10 +32,12 @@ public class Mqtt5Int {
         return new Result("Connected. user = " + user + ".");
     }
 
-    public Result subscribe(String topic, Consumer<Mqtt5Publish> callback) {
+    public Result subscribe(String topic, Consumer<Publish> callback) {
         mqtt5AsyncClient.subscribeWith()
                 .topicFilter(topic)
-                .callback(callback)
+                .callback(mqtt5Publish -> {
+                    callback.accept(new Publish(mqtt5Publish.getPayloadAsBytes()));
+                })
                 .send()
                 .join();
         return new Result("Subscribed. topic = " + topic + ".");
@@ -52,5 +53,8 @@ public class Mqtt5Int {
     }
 
     public record Result(String description) {
+    }
+
+    public record Publish(byte[] data) {
     }
 }

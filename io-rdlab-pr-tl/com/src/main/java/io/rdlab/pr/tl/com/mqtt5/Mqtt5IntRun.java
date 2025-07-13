@@ -51,7 +51,7 @@ public class Mqtt5IntRun {
                     String calculatedTopic =
                             (topic == null || topic.isEmpty() || "_".equals(topic)) ? "thing/com" : topic;
                     println(mqtt5Int.subscribe(calculatedTopic, publish -> {
-                        String message = new String(publish.getPayloadAsBytes(), Charset.defaultCharset());
+                        String message = new String(publish.data(), Charset.defaultCharset());
                         println(message);
                         print(">");
                     }));
