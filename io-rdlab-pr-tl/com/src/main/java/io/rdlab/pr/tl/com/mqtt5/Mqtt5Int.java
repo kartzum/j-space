@@ -63,7 +63,7 @@ public class Mqtt5Int {
     public Result disconnect() {
         mqtt5AsyncClient.disconnect().join();
         mqtt5AsyncClient = null;
-        return new Result("Dicsonnected.");
+        return new Result("Disconnected.");
     }
 
     public record Result(String description) {

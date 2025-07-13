@@ -1,11 +1,9 @@
 package io.rdlab.pr.tl.com.mqtt5;
 
-import java.net.Inet4Address;
-import java.net.Inet6Address;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.util.Scanner;
+
+import static io.rdlab.pr.tl.com.util.Utils.createInetAddress;
 
 public class Mqtt5IntRun {
     private static final String EXIT = "exit";
@@ -53,8 +51,8 @@ public class Mqtt5IntRun {
                     String calculatedTopic =
                             (topic == null || topic.isEmpty() || "_".equals(topic)) ? "thing/com" : topic;
                     println(mqtt5Int.subscribe(calculatedTopic, publish -> {
-                        String message = new String(publish.data(), Charset.defaultCharset());
-                        println(message);
+                        String dataAsString = new String(publish.data(), Charset.defaultCharset());
+                        println(dataAsString);
                         print(">");
                     }));
                     break;
@@ -64,9 +62,9 @@ public class Mqtt5IntRun {
                     String topic = scanner.next();
                     String calculatedTopic =
                             (topic == null || topic.isEmpty() || "_".equals(topic)) ? "thing/com" : topic;
-                    String message = scanner.next();
+                    String data = scanner.next();
                     println(
-                            mqtt5Int.publish(calculatedTopic, message.getBytes(Charset.defaultCharset()))
+                            mqtt5Int.publish(calculatedTopic, data.getBytes(Charset.defaultCharset()))
                     );
                     break;
                 }
@@ -89,18 +87,6 @@ public class Mqtt5IntRun {
             }
         } while (!EXIT.equals(command));
         return 0;
-    }
-
-    private InetAddress createInetAddress(String host) {
-        try {
-            return Inet4Address.getByName(host);
-        } catch (UnknownHostException e) {
-            try {
-                return Inet6Address.getByName(host);
-            } catch (UnknownHostException ex) {
-                throw new RuntimeException(ex);
-            }
-        }
     }
 
     private void print(Object s) {
