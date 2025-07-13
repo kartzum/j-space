@@ -52,6 +52,20 @@ public class Mqtt5Int {
         return new Result("Published. topic = " + topic + ".");
     }
 
+    public Result unsubscribe(String topic) {
+        mqtt5AsyncClient.unsubscribeWith()
+                .topicFilter(topic)
+                .send()
+                .join();
+        return new Result("Unsubscribed. topic = " + topic + ".");
+    }
+
+    public Result disconnect() {
+        mqtt5AsyncClient.disconnect().join();
+        mqtt5AsyncClient = null;
+        return new Result("Dicsonnected.");
+    }
+
     public record Result(String description) {
     }
 

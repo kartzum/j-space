@@ -13,6 +13,8 @@ public class Mqtt5IntRun {
     private static final String CONNECT = "connect";
     private static final String SUBSCRIBE = "subscribe";
     private static final String PUBLISH = "publish";
+    private static final String UNSUBSCRIBE = "unsubscribe";
+    private static final String DISCONNECT = "disconnect";
 
     public Integer run() {
         Mqtt5Int mqtt5Int = new Mqtt5Int();
@@ -65,6 +67,22 @@ public class Mqtt5IntRun {
                     String message = scanner.next();
                     println(
                             mqtt5Int.publish(calculatedTopic, message.getBytes(Charset.defaultCharset()))
+                    );
+                    break;
+                }
+                case UNSUBSCRIBE: {
+                    print(">Enter topic (default: thing/com).>");
+                    String topic = scanner.next();
+                    String calculatedTopic =
+                            (topic == null || topic.isEmpty() || "_".equals(topic)) ? "thing/com" : topic;
+                    println(
+                            mqtt5Int.unsubscribe(calculatedTopic)
+                    );
+                    break;
+                }
+                case DISCONNECT: {
+                    println(
+                            mqtt5Int.disconnect()
                     );
                     break;
                 }
