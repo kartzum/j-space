@@ -148,5 +148,8 @@ langchain4j and so on examples.
 ### io-rdlab-net-ex
 Network examples.
 
-### art
+### io-rdlab-amq-art
 Activemq examples.
+
+### io-rdlab-pr-tl
+IoT/IIoT communication tools.
