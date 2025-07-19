@@ -29,10 +29,10 @@ public class TlCommand implements Callable<Integer> {
     private String password = "p";
 
     @CommandLine.Option(names = {"-c", "--topic"}, description = "topics")
-    private String topics = "thing/com,thing/con,thing/cot";
+    private String topics = "thing/com";
 
     @CommandLine.Option(names = {"-n", "--number"}, description = "number")
-    private String number = "3";
+    private String number = "1";
 
     @Override
     public Integer call() {
@@ -46,7 +46,8 @@ public class TlCommand implements Callable<Integer> {
                     user,
                     password,
                     topics,
-                    number
+                    number,
+                    true
             );
         }
         return 0;

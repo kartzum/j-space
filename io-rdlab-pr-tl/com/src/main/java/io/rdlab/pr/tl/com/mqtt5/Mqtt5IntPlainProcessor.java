@@ -54,6 +54,14 @@ public class Mqtt5IntPlainProcessor {
         }
     }
 
+    public long getCounts() {
+        return runner.getCounts();
+    }
+
+    public long getTotalTime() {
+        return runner.getTotalTime();
+    }
+
     private static class Runner {
         private Mqtt5Int mqtt5Int;
         private List<String> topics;
@@ -63,6 +71,8 @@ public class Mqtt5IntPlainProcessor {
         private volatile String topic;
         private volatile String nextTopic;
         private String id;
+        private volatile long counts;
+        private volatile long totalTime;
 
         public void start(
                 InetAddress host,
@@ -91,13 +101,19 @@ public class Mqtt5IntPlainProcessor {
                                     "data", publish.data(),
                                     "topic", topic,
                                     "topics", topics,
-                                    "totalCounter", 15L,
+                                    "totalCounter", 12L,
                                     "changeTopic", true,
                                     "id", id
                             )
                     );
                 }
                 if (result != null) {
+                    if (result.get("counts") instanceof Long countsInner) {
+                        counts = countsInner;
+                    }
+                    if (result.get("totalTime") instanceof Long totalTimeInner) {
+                        totalTime = totalTimeInner;
+                    }
                     if (result.get("data") instanceof byte[] dataAsArray) {
                         if (result.get("nextTopic") instanceof String nextTopicInner) {
                             if (!topic.equals(nextTopicInner)) {
@@ -125,6 +141,14 @@ public class Mqtt5IntPlainProcessor {
 
         public boolean isRestart() {
             return restart;
+        }
+
+        public long getCounts() {
+            return counts;
+        }
+
+        public long getTotalTime() {
+            return totalTime;
         }
 
         public void close() {
