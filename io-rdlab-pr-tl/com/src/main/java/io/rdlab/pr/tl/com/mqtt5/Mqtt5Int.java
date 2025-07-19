@@ -5,6 +5,7 @@ import com.hivemq.client.mqtt.mqtt5.Mqtt5AsyncClient;
 
 import java.net.InetAddress;
 import java.util.UUID;
+import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 public class Mqtt5Int {
@@ -38,6 +39,7 @@ public class Mqtt5Int {
                 .callback(mqtt5Publish -> {
                     callback.accept(new Publish(mqtt5Publish.getPayloadAsBytes()));
                 })
+                .executor(Executors.newVirtualThreadPerTaskExecutor())
                 .send()
                 .join();
         return new Result("Subscribed. topic = " + topic + ".");

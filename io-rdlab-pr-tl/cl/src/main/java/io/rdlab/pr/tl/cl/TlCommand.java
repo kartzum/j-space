@@ -1,6 +1,6 @@
 package io.rdlab.pr.tl.cl;
 
-import io.rdlab.pr.tl.com.mqtt5.Mqtt5IntPlainExecutorRun;
+import io.rdlab.pr.tl.com.mqtt5.Mqtt5IntPlainProcessorRun;
 import io.rdlab.pr.tl.com.mqtt5.Mqtt5IntRun;
 import picocli.CommandLine;
 
@@ -28,8 +28,11 @@ public class TlCommand implements Callable<Integer> {
     @CommandLine.Option(names = {"-p", "--password"}, description = "password")
     private String password = "p";
 
-    @CommandLine.Option(names = {"-c", "--topic"}, description = "topic")
-    private String topic = "thing/com";
+    @CommandLine.Option(names = {"-c", "--topic"}, description = "topics")
+    private String topics = "thing/com,thing/con,thing/cot";
+
+    @CommandLine.Option(names = {"-n", "--number"}, description = "number")
+    private String number = "3";
 
     @Override
     public Integer call() {
@@ -37,13 +40,13 @@ public class TlCommand implements Callable<Integer> {
         if ("mqtt-5-int-run".equals(tool)) {
             return new Mqtt5IntRun().run();
         } else if ("mqtt-5-int-pe".equals(tool)) {
-            return new Mqtt5IntPlainExecutorRun().run(
+            return new Mqtt5IntPlainProcessorRun().run(
                     host,
                     Integer.parseInt(port),
                     user,
                     password,
-                    topic,
-                    null
+                    topics,
+                    number
             );
         }
         return 0;
