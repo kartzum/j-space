@@ -31,8 +31,14 @@ public class TlCommand implements Callable<Integer> {
     @CommandLine.Option(names = {"-c", "--topic"}, description = "topics")
     private String topics = "thing/com";
 
-    @CommandLine.Option(names = {"-n", "--number"}, description = "number")
-    private String number = "1";
+    @CommandLine.Option(names = {"-n", "--threads"}, description = "threads")
+    private String threads = "1";
+
+    @CommandLine.Option(names = {"-l", "--total"}, description = "total")
+    private String total = "12";
+
+    @CommandLine.Option(names = {"-d", "--dir"}, description = "dir")
+    private String dir = ""; //"/tmp/.pr-tl/default";
 
     @Override
     public Integer call() {
@@ -46,8 +52,10 @@ public class TlCommand implements Callable<Integer> {
                     user,
                     password,
                     topics,
-                    number,
-                    true
+                    threads,
+                    true,
+                    dir,
+                    Long.parseLong(total)
             );
         }
         return 0;

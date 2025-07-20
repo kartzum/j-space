@@ -24,14 +24,15 @@ public class Mqtt5IntPlainProcessor {
             String password,
             String topics,
             Supplier<Robot> robotSupplier,
-            String id
+            String id,
+            long total
     ) {
         if (runner != null) {
             runner.close();
         }
         runner = new Runner();
         try (ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor()) {
-            runner.start(host, port, user, password, topics, robotSupplier, id);
+            runner.start(host, port, user, password, topics, robotSupplier, id, total);
             executorService.submit(() -> {
                 do {
                     runner.run();
@@ -73,6 +74,7 @@ public class Mqtt5IntPlainProcessor {
         private String id;
         private volatile long counts;
         private volatile long totalTime;
+        private long total;
 
         public void start(
                 InetAddress host,
@@ -81,7 +83,8 @@ public class Mqtt5IntPlainProcessor {
                 String password,
                 String topics,
                 Supplier<Robot> robotSupplier,
-                String id
+                String id,
+                long total
         ) {
             this.topics = !topics.contains(",") ? List.of(topics) : Arrays.stream(topics.split(",")).toList();
             this.robotSupplier = robotSupplier;
@@ -90,6 +93,7 @@ public class Mqtt5IntPlainProcessor {
             this.mqtt5Int.connect(user, password);
             this.topic = this.topics.getFirst();
             this.id = id;
+            this.total = total;
         }
 
         public void run() {
@@ -101,7 +105,7 @@ public class Mqtt5IntPlainProcessor {
                                     "data", publish.data(),
                                     "topic", topic,
                                     "topics", topics,
-                                    "totalCounter", 12L,
+                                    "totalCounter", total,
                                     "changeTopic", true,
                                     "id", id
                             )
