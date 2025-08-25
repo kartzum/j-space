@@ -1,4 +1,4 @@
-package io.rdlab.pr.tl.com.mqtt5;
+package io.rdlab.pr.tl.com.mqtt;
 
 import com.hivemq.client.mqtt.MqttClient;
 import com.hivemq.client.mqtt.mqtt5.Mqtt5AsyncClient;
@@ -8,7 +8,7 @@ import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
-public class Mqtt5Int {
+public class Mqtt5Client {
     private Mqtt5AsyncClient mqtt5AsyncClient;
 
     public Result start(InetAddress host, int port) {

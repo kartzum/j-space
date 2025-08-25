@@ -1,11 +1,11 @@
-package io.rdlab.pr.tl.com.mqtt5;
+package io.rdlab.pr.tl.com.mqtt;
 
 import java.nio.charset.Charset;
 import java.util.Scanner;
 
 import static io.rdlab.pr.tl.com.util.Utils.createInetAddress;
 
-public class Mqtt5IntRun {
+public class Mqtt5ClientRunner {
     private static final String EXIT = "exit";
     private static final String START = "start";
     private static final String CONNECT = "connect";
@@ -15,7 +15,7 @@ public class Mqtt5IntRun {
     private static final String DISCONNECT = "disconnect";
 
     public Integer run() {
-        Mqtt5Int mqtt5Int = new Mqtt5Int();
+        Mqtt5Client mqtt5Int = new Mqtt5Client();
         Scanner scanner = new Scanner(System.in);
         scanner.useDelimiter("\\n");
         String command;
