@@ -1,0 +1,11 @@
+services:
+  emqx:
+    image: emqx/emqx:5.8.7
+    container_name: emqx
+    environment:
+      # Allow anonymous connections
+      EMQX_AUTH__ANONYMOUS__ALLOW: "true"
+    ports:
+      - "1883:1883" # MQTT over TCP
+      - "8083:8083" # MQTT over WebSocket
+      - "18083:18083" # EMQX Dashboard

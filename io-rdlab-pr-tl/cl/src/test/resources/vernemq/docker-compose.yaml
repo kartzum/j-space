@@ -1,0 +1,10 @@
+services:
+  vernemq:
+    image: vernemq/vernemq:2.1.1
+    ports:
+      - "1883:1883" # Standard MQTT port
+      - "8883:8883" # MQTT over TLS port (if configured)
+    environment:
+      - DOCKER_VERNEMQ_ALLOW_ANONYMOUS=on
+    volumes:
+      - ./vernemq.conf:/etc/vernemq/vernemq.conf
